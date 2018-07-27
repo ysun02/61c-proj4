@@ -4,7 +4,7 @@ all: cnn cnn_server
 cnn: src/cnn.c src/util.c src/main.c src/timestamp.c
 	gcc $(CFLAGS) src/cnn.c -lm -o cnn
 
-cnn_server: src/cnn.c src/python.c src/util.c src/timestamp.c
+cnnModule.so: src/cnn.c src/python.c src/util.c src/timestamp.c
 	gcc $(CFLAGS) -shared  -fPIC -I/usr/include/python2.7 -o cnnModule.so src/python.c src/cnn.c
 
 starter: cnn_starter
