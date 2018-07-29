@@ -1,5 +1,5 @@
 CFLAGS=-Wno-unused-result -mavx -O3 -std=c99 -g -fopenmp
-all: cnn cnn_server 
+all: cnn cnnModule.so 
 
 cnn: src/cnn.c src/util.c src/main.c src/timestamp.c
 	gcc $(CFLAGS) src/cnn.c -lm -o cnn
