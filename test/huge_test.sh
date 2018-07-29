@@ -1,5 +1,5 @@
 echo
-echo '          *** CS 61C, Spring 2017: Project 4 ***'
+echo '          *** CS 61C, Summer 2018: Project 4 ***'
 echo
 echo 'If your tests fail, you can find the output from each test run in a file'
 echo 'test/out/<N>.txt, and the expected output in test/ref/<N>.txt. Each of'
