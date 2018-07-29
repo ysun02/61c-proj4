@@ -175,34 +175,48 @@ conv_layer_t* make_conv_layer(int in_sx, int in_sy, int in_depth,
 
 void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) {
     uint64_t start1 = timestamp_us();
-    for (int i = start; i <= end; i++) {
-    vol_t* V = in[i];
-    vol_t* A = out[i];
 
+    int xy_stride = l->stride;
+    int x = -l->pad;
+    int y = -l->pad;
+    int l_out_sx = l->out_sx;
+    int l_out_sy = l->out_sy;
+    vol_t* V;
+    vol_t* A;
+    vol_t* f;
+
+    for (int i = start; i <= end; i++) {
+    V = in[i];
+    A = out[i];
     int V_sx = V->sx;
     int V_sy = V->sy;
-    int xy_stride = l->stride;
 
     for(int d = 0; d < l->out_depth; d++) {
-      vol_t* f = l->filters[d];
-      int x = -l->pad;
-      int y = -l->pad;
-      for(int ay = 0; ay < l->out_sy; y += xy_stride, ay++) {
-        x = -l->pad;
-        for(int ax=0; ax < l->out_sx; x += xy_stride, ax++) {
+      f = l->filters[d];
+      int f_sy = f->sy;
+      int f_sx = f->sx;
+      int f_depth = f->depth;
+      int l_biases_wd = l->biases->w[d];
+      for(int ay = 0; ay < l_out_sy; y += xy_stride, ay++) {
+
+        for(int ax=0; ax < l_out_sx; x += xy_stride, ax++) {
           double a = 0.0;
-          for(int fy = 0; fy < f->sy; fy++) {
+          for(int fy = 0; fy < f_sy; fy++) {
             int oy = y + fy;
-            for(int fx = 0; fx < f->sx; fx++) {
+            if(oy >= V_sy){
+              break;
+            }
+            for(int fx = 0; fx < f_sx; fx++) {
               int ox = x + fx;
-              if(oy >= 0 && oy < V_sy && ox >=0 && ox < V_sx) {
-                for(int fd=0;fd < f->depth; fd++) {
-                  a += f->w[((f->sx * fy)+fx)*f->depth+fd] * V->w[((V_sx * oy)+ox)*V->depth+fd];
+
+              if(oy >= 0 && ox >=0 && ox < V_sx) {
+                for(int fd=0;fd < f_depth; fd++) {
+                  a += f->w[((f_sx * fy)+fx)*f_depth+fd] * V->w[((V_sx * oy)+ox)*f_depth+fd];
                 }
               }
             }
           }
-          a += l->biases->w[d];
+          a += l_biases_wd;
           set_vol(A, ax, ay, d, a);
         }
       }
