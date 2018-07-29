@@ -150,7 +150,7 @@ conv_layer_t* make_conv_layer(int in_sx, int in_sy, int in_depth,
   l->in_depth = in_depth;
   l->in_sx = in_sx;
   l->in_sy = in_sy;
-    
+
   // optional
   l->sy = l->sx;
   l->stride = stride;
@@ -178,11 +178,11 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
     for (int i = start; i <= end; i++) {
     vol_t* V = in[i];
     vol_t* A = out[i];
-        
+
     int V_sx = V->sx;
     int V_sy = V->sy;
     int xy_stride = l->stride;
-  
+
     for(int d = 0; d < l->out_depth; d++) {
       vol_t* f = l->filters[d];
       int x = -l->pad;
@@ -209,10 +209,10 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
     }
     }
     uint64_t end1 = timestamp_us();
-    
+
     total1 += end1-start1;
-    total1+=end1-start1;
-    
+
+
 }
 
 void conv_load(conv_layer_t* l, const char* fn) {
@@ -333,7 +333,7 @@ void pool_forward(pool_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
   for (int i = start; i <= end; i++) {
     vol_t* V = in[i];
     vol_t* A = out[i];
-        
+
     int n=0;
     for(int d=0;d<l->out_depth;d++) {
       int x = -l->pad;
@@ -341,7 +341,7 @@ void pool_forward(pool_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
       for(int ax=0; ax<l->out_sx; x+=l->stride,ax++) {
         y = -l->pad;
         for(int ay=0; ay<l->out_sy; y+=l->stride,ay++) {
-  
+
           double a = -99999;
           for(int fx=0;fx<l->sx;fx++) {
             for(int fy=0;fy<l->sy;fy++) {
@@ -394,7 +394,7 @@ fc_layer_t* make_fc_layer(int in_sx, int in_sy, int in_depth,
   l->in_depth = in_depth;
   l->in_sx = in_sx;
   l->in_sy = in_sy;
-    
+
   // optional
   l->l1_decay_mul = 0.0;
   l->l2_decay_mul = 1.0;
@@ -417,11 +417,11 @@ fc_layer_t* make_fc_layer(int in_sx, int in_sy, int in_depth,
 
 void fc_forward(fc_layer_t* l, vol_t** in, vol_t** out, int start, int end) {
     uint64_t start4 = timestamp_us();
-    
+
     for (int j = start; j <= end; j++) {
     vol_t* V = in[j];
     vol_t* A = out[j];
-        
+
     for(int i=0;i<l->out_depth;i++) {
       double a = 0.0;
       for(int d=0;d<l->num_inputs;d++) {
@@ -470,7 +470,7 @@ typedef struct softmax_layer {
   int in_depth;
   int in_sx;
   int in_sy;
-  double* es; 
+  double* es;
 
   // computed
   int out_depth;
@@ -498,19 +498,19 @@ softmax_layer_t* make_softmax_layer(int in_sx, int in_sy, int in_depth) {
 
 void softmax_forward(softmax_layer_t* l, vol_t** in, vol_t** out, int start, int end) {
     uint64_t start5 = timestamp_us();
-    
+
   double es[MAX_ES];
 
   for (int j = start; j <= end; j++) {
     vol_t* V = in[j];
     vol_t* A = out[j];
-  
+
     // compute max activation
     double amax = V->w[0];
     for(int i=1;i<l->out_depth;i++) {
       if(V->w[i] > amax) amax = V->w[i];
     }
-  
+
     // compute exponentials (carefully to not blow up)
     double esum = 0.0;
     for(int i=0;i<l->out_depth;i++) {
@@ -518,7 +518,7 @@ void softmax_forward(softmax_layer_t* l, vol_t** in, vol_t** out, int start, int
       esum += e;
       es[i] = e;
     }
-  
+
     // normalize and output to sum to one
     for(int i=0;i<l->out_depth;i++) {
       es[i] /= esum;
@@ -586,7 +586,7 @@ network_t* make_network() {
   return net;
 }
 
-/* 
+/*
  * Free our specific CNN.
  */
 
@@ -687,7 +687,7 @@ void net_classify_cats(network_t* net, vol_t** input, double* output, int n) {
   for (int i = 0; i < n; i++) {
     copy_vol(batch[0][0], input[i]);
     net_forward(net, batch, 0, 0);
-    output[i] = batch[11][0]->w[CAT_LABEL]; 
+    output[i] = batch[11][0]->w[CAT_LABEL];
   }
   printf("%s", "forward: ");
   printf("%" PRIu64 "\n", total1);
