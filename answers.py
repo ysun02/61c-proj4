@@ -1,18 +1,18 @@
 #Times of each layer (in ms) with 3 decimal place precision
 #TODO: FILL IN
 
-CONV_L1 = 
-RELU_L1 = 
-POOL_L1 = 
-CONV_L2 = 
-RELU_L2 = 
-POOL_L2 = 
-CONV_L3 = 
-RELU_L3 = 
-POOL_L3 = 
-FC_L1 = 
-SOFTMAX_L1 = 
-TOTAL_TIME = 
+CONV_L1 = 7695.895
+RELU_L1 = 66.182
+POOL_L1 = 129.214
+CONV_L2 = 7695.895
+RELU_L2 = 66.182
+POOL_L2 = 129.214
+CONV_L3 = 7695.895
+RELU_L3 = 66.182
+POOL_L3 = 129.214
+FC_L1 = 6.560
+SOFTMAX_L1 = 0.800
+TOTAL_TIME = 7898.651
 
 
 layer_times = [CONV_L1, RELU_L1, POOL_L1, CONV_L2, RELU_L2, POOL_L2, CONV_L3, RELU_L3, POOL_L3, FC_L1, SOFTMAX_L1]
@@ -39,7 +39,7 @@ for label in layer_types:
 f.write("\nQUESTION 3\n\n")
 
 #TODO: FILL IN
-ahmdal = lambda p: 
+ahmdal = lambda p: 1/((1-p)+(p/4))
 
 for label in layer_types:
 	f.write("{0:<15}: {1:>3.2f}x\n".format(label, ahmdal(total_percents[label])))
