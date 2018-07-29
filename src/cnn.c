@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "timestamp.c"
-
+#include <inttypes.h>
 // Include SSE intrinsics
 #if defined(_MSC_VER)
 #include <intrin.h>
@@ -91,6 +91,11 @@ void free_vol(vol_t* v) {
   free(v->w);
   free(v);
 }
+uint64_t total1 = 0;
+uint64_t total2 = 0;
+uint64_t total3 = 0;
+uint64_t total4 = 0;
+uint64_t total5 = 0;
 
 // A note about layers --------------------------------------------------------
 
@@ -169,7 +174,8 @@ conv_layer_t* make_conv_layer(int in_sx, int in_sy, int in_depth,
 }
 
 void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) {
-  for (int i = start; i <= end; i++) {
+    uint64_t start1 = timestamp_us();
+    for (int i = start; i <= end; i++) {
     vol_t* V = in[i];
     vol_t* A = out[i];
         
@@ -201,7 +207,12 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
         }
       }
     }
-  }
+    }
+    uint64_t end1 = timestamp_us();
+    
+    total1 += end1-start1;
+    total1+=end1-start1;
+    
 }
 
 void conv_load(conv_layer_t* l, const char* fn) {
@@ -264,11 +275,14 @@ relu_layer_t* make_relu_layer(int in_sx, int in_sy, int in_depth) {
 }
 
 void relu_forward(relu_layer_t* l, vol_t** in, vol_t** out, int start, int end) {
+    uint64_t start2 = timestamp_us();
   for (int j = start; j <= end; j++) {
     for (int i = 0; i < l->in_sx*l->in_sy*l->in_depth; i++) {
       out[j]->w[i] = (in[j]->w[i] < 0.0) ? 0.0 : in[j]->w[i];
     }
   }
+  uint64_t end2 = timestamp_us();
+  total2+=end2-start2;
 }
 
 // Pool Layer -----------------------------------------------------------------
@@ -315,6 +329,7 @@ pool_layer_t* make_pool_layer(int in_sx, int in_sy, int in_depth,
 }
 
 void pool_forward(pool_layer_t* l, vol_t** in, vol_t** out, int start, int end) {
+    uint64_t start3 = timestamp_us();
   for (int i = start; i <= end; i++) {
     vol_t* V = in[i];
     vol_t* A = out[i];
@@ -344,6 +359,8 @@ void pool_forward(pool_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
       }
     }
   }
+  uint64_t end3 = timestamp_us();
+  total3+=end3-start3;
 }
 
 // FC Layer -------------------------------------------------------------------
@@ -399,7 +416,9 @@ fc_layer_t* make_fc_layer(int in_sx, int in_sy, int in_depth,
 }
 
 void fc_forward(fc_layer_t* l, vol_t** in, vol_t** out, int start, int end) {
-  for (int j = start; j <= end; j++) {
+    uint64_t start4 = timestamp_us();
+    
+    for (int j = start; j <= end; j++) {
     vol_t* V = in[j];
     vol_t* A = out[j];
         
@@ -412,6 +431,8 @@ void fc_forward(fc_layer_t* l, vol_t** in, vol_t** out, int start, int end) {
       A->w[i] = a;
     }
   }
+    uint64_t end4 = timestamp_us();
+    total4+=end4-start4;
 }
 
 void fc_load(fc_layer_t* l, const char* fn) {
@@ -476,6 +497,8 @@ softmax_layer_t* make_softmax_layer(int in_sx, int in_sy, int in_depth) {
 }
 
 void softmax_forward(softmax_layer_t* l, vol_t** in, vol_t** out, int start, int end) {
+    uint64_t start5 = timestamp_us();
+    
   double es[MAX_ES];
 
   for (int j = start; j <= end; j++) {
@@ -502,6 +525,8 @@ void softmax_forward(softmax_layer_t* l, vol_t** in, vol_t** out, int start, int
       A->w[i] = es[i];
     }
   }
+  uint64_t end5 = timestamp_us();
+  total5+=end5-start5;
 }
 
 // Neural Network -------------------------------------------------------------
@@ -664,7 +689,16 @@ void net_classify_cats(network_t* net, vol_t** input, double* output, int n) {
     net_forward(net, batch, 0, 0);
     output[i] = batch[11][0]->w[CAT_LABEL]; 
   }
-
+  printf("%s", "forward: ");
+  printf("%" PRIu64 "\n", total1);
+  printf("%s", "relu: ");
+  printf("%" PRIu64 "\n", total2);
+  printf("%s", "pool: ");
+  printf("%" PRIu64 "\n", total3);
+  printf("%s", "fc: ");
+  printf("%" PRIu64 "\n", total4);
+  printf("%s", "softmax: ");
+  printf("%" PRIu64 "\n", total5);
   free_batch(batch, 1);
 }
 
