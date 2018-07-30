@@ -212,13 +212,15 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
     V_sy = V->sy;
     l_out_depth = l->out_depth;
     xy_stride = l->stride;
-    f_depth = f->depth;
-    V_depth = V->depth;
+
     for(d = 0; d < l_out_depth; d++) {
       f = l->filters[d];
       f_sy = f->sy;
       f_sx = f->sx;
 
+      f_depth = f->depth;
+      V_depth = V->depth;
+      
       l_biases_wd = l->biases->w[d];
       l_out_sx = l->out_sx;
       l_out_sy = l->out_sy;
