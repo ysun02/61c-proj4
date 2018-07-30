@@ -240,7 +240,9 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
                   a += f->w[((f_sx * fy)+fx)*f_depth+2] * V->w[((V_sx * oy)+ox)*f_depth+2];
                   a += f->w[((f_sx * fy)+fx)*f_depth+3] * V->w[((V_sx * oy)+ox)*f_depth+3];
                 }
-                for()
+                for(fd=(fd/4)*4; fd < f_depth; fd++){
+                  a += f->w[((f_sx * fy)+fx)*f_depth+fd] * V->w[((V_sx * oy)+ox)*f_depth+fd];
+                }
               }
             }
           }
