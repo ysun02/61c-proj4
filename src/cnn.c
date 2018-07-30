@@ -200,10 +200,10 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
     int f_depth, V_depth;
     int l_out_depth;
 
-    // __m256d next_v;
-    // __m256d next_f;
-    // __m256d result;
-    // double part[4];
+    __m256d next_v;
+    __m256d next_f;
+    __m256d result;
+    double part[4];
 
     for (i = start; i <= end; i++) {
     V = in[i];
