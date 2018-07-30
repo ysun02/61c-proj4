@@ -224,9 +224,9 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
       l_out_sx = l->out_sx;
       l_out_sy = l->out_sy;
 
-      y = -l->pad;
+      y = -2;
       for(ay = 0; ay < l_out_sy; y += xy_stride, ay++) {
-        x = -l->pad;
+        x = -2;
         for(ax=0; ax < l_out_sx; x += xy_stride, ax++) {
           a = 0.0;
           for(fy = 0; fy < f_sy; fy++) {
@@ -244,7 +244,6 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
                 for(fd=0;fd < f_depth; fd++) {
                   a += f->w[((f_sx * fy)+fx)*f_depth+fd] * V->w[((V_sx * oy)+ox)*V_depth+fd];
                 }
-
                   // for(fd=0; fd < f_depth/4 * 4; fd+=4) {
                     // f_v = ((f_sx * fy)+fx)*f_depth;
                     // v_v = ((V_sx * oy)+ox)*V_depth;
@@ -253,16 +252,16 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
                     // next_v = _mm256_loadu_pd((double const*) &V->w[v_v]);
                     // result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
                     //
-                  //   a += f->w[((f_sx * fy)+fx)*f_depth] * V->w[((V_sx * oy)+ox)*V_depth];
-                  //   a += f->w[((f_sx * fy)+fx)*f_depth+1] * V->w[((V_sx * oy)+ox)*V_depth+1];
-                  //   a += f->w[((f_sx * fy)+fx)*f_depth+2] * V->w[((V_sx * oy)+ox)*V_depth+2];
-                  //   a += f->w[((f_sx * fy)+fx)*f_depth+3] * V->w[((V_sx * oy)+ox)*V_depth+3];
+                  //   a += f->w[f_v] * V->w[v_v];
+                  //   a += f->w[f_v+1] * V->w[v_v+1];
+                  //   a += f->w[f_v+2] * V->w[v_v+2];
+                  //   a += f->w[f_v+3] * V->w[v_v+3];
                   //
                   // }
                   // _mm256_store_pd(part, result);
                   // a = a + part[0] + part[1] + part[2] + part[3];
                   // for(fd=(f_depth/4)*4; fd < f_depth; fd++){
-                  //   a += f->w[((f_sx * fy)+fx)*f_depth+fd] * V->w[((V_sx * oy)+ox)*V_depth+fd];
+                  //   a += f->w[f_v+fd] * V->w[v_v+fd];
                   // }
                 }
               }
