@@ -183,6 +183,9 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
     int l_out_sx;
     int l_out_sy;
     int f_sy, f_sx;
+    int fx, fy, fd;
+    int ay, ax;
+    int i, d;
 
     double a;
     double l_biases_wd;
@@ -196,7 +199,7 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
     int f_depth;
     int l_out_depth;
 
-    for (int i = start; i <= end; i++) {
+    for (i = start; i <= end; i++) {
     V = in[i];
     A = out[i];
     V_sx = V->sx;
@@ -204,7 +207,7 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
     l_out_depth = l->out_depth;
     xy_stride = l->stride;
 
-    for(int d = 0; d < l_out_depth; d++) {
+    for(d = 0; d < l_out_depth; d++) {
       f = l->filters[d];
       f_sy = f->sy;
       f_sx = f->sx;
@@ -214,16 +217,16 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
       l_out_sy = l->out_sy;
 
       y = -l->pad;
-      for(int ay = 0; ay < l_out_sy; y += xy_stride, ay++) {
+      for(ay = 0; ay < l_out_sy; y += xy_stride, ay++) {
         x = -l->pad;
-        for(int ax=0; ax < l_out_sx; x += xy_stride, ax++) {
+        for(ax=0; ax < l_out_sx; x += xy_stride, ax++) {
           a = 0.0;
-          for(int fy = 0; fy < f_sy; fy++) {
+          for(fy = 0; fy < f_sy; fy++) {
             oy = y + fy;
             if(oy >= V_sy){
               break;
             }
-            for(int fx = 0; fx < f_sx; fx++) {
+            for(fx = 0; fx < f_sx; fx++) {
               ox = x + fx;
 
               if(oy >= 0 && ox >=0 && ox < V_sx) {
@@ -231,12 +234,13 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
                 //   a += f->w[((f_sx * fy)+fx)*f_depth+fd] * V->w[((V_sx * oy)+ox)*f_depth+fd];
                 // }
 
-                for(int fd=0; (fd/4) * 4 < f_depth; fd+=4) {
+                for(fd=0; (fd/4) * 4 < f_depth; fd+=4) {
                   a += f->w[((f_sx * fy)+fx)*f_depth] * V->w[((V_sx * oy)+ox)*f_depth];
                   a += f->w[((f_sx * fy)+fx)*f_depth+1] * V->w[((V_sx * oy)+ox)*f_depth+1];
                   a += f->w[((f_sx * fy)+fx)*f_depth+2] * V->w[((V_sx * oy)+ox)*f_depth+2];
                   a += f->w[((f_sx * fy)+fx)*f_depth+3] * V->w[((V_sx * oy)+ox)*f_depth+3];
                 }
+                for()
               }
             }
           }
