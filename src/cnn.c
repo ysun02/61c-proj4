@@ -200,10 +200,10 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
     int f_depth, V_depth;
     int l_out_depth;
 
-    __m256d next_v;
-    __m256d next_f;
-    __m256d result;
-    double part[4];
+    // __m256d next_v;
+    // __m256d next_f;
+    // __m256d result;
+    // double part[4];
 
     for (i = start; i <= end; i++) {
     V = in[i];
@@ -234,16 +234,14 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
             if(oy >= V_sy){
               break;
             }
-          
 
+            for(fx = 0; fx < f_sx; fx++) {
+              ox = x + fx;
 
-              for(fx = 0; fx < f_sx; fx++) {
-                ox = x + fx;
-
-                if(oy >= 0 && ox >=0 && ox < V_sx) {
-                  for(fd=0;fd < f_depth; fd++) {
-                    a += f->w[((f_sx * fy)+fx)*f_depth+fd] * V->w[((V_sx * oy)+ox)*V_depth+fd];
-                  }
+              if(oy >= 0 && ox >=0 && ox < V_sx) {
+                for(fd=0;fd < f_depth; fd++) {
+                  a += f->w[((f_sx * fy)+fx)*f_depth+fd] * V->w[((V_sx * oy)+ox)*V_depth+fd];
+                }
 
                   // for(fd=0; fd < f_depth/4 * 4; fd+=4) {
                     // f_v = ((f_sx * fy)+fx)*f_depth;
