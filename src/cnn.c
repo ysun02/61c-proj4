@@ -223,31 +223,33 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
           a = 0.0;
           for(fy = 0; fy < f_sy; fy++) {
             oy = y + fy;
-            if(oy < 0){
-              break;
-            }
+
             if(oy >= V_sy){
               break;
             }
-            for(fx = 0; fx < f_sx; fx++) {
-              ox = x + fx;
+            if(oy >= 0){
 
-              if(ox >=0 && ox < V_sx) {
-                for(fd=0;fd < f_depth; fd++) {
-                  a += f->w[((f_sx * fy)+fx)*f_depth+fd] * V->w[((V_sx * oy)+ox)*f_depth+fd];
+
+              for(fx = 0; fx < f_sx; fx++) {
+                ox = x + fx;
+
+                if(ox >=0 && ox < V_sx) {
+                  // for(fd=0;fd < f_depth; fd++) {
+                  //   a += f->w[((f_sx * fy)+fx)*f_depth+fd] * V->w[((V_sx * oy)+ox)*f_depth+fd];
+                  // }
+
+                  for(fd=0; fd < f_depth/4 * 4; fd+=4) {
+                    a += f->w[((f_sx * fy)+fx)*f_depth] * V->w[((V_sx * oy)+ox)*f_depth];
+                    a += f->w[((f_sx * fy)+fx)*f_depth+1] * V->w[((V_sx * oy)+ox)*f_depth+1];
+                    a += f->w[((f_sx * fy)+fx)*f_depth+2] * V->w[((V_sx * oy)+ox)*f_depth+2];
+                    a += f->w[((f_sx * fy)+fx)*f_depth+3] * V->w[((V_sx * oy)+ox)*f_depth+3];
+                  }
+                  for(fd=(f_depth/4)*4; fd < f_depth; fd++){
+                    a += f->w[((f_sx * fy)+fx)*f_depth+fd] * V->w[((V_sx * oy)+ox)*f_depth+fd];
+                  }
                 }
-
-                // for(fd=0; (fd/4) * 4 < f_depth; fd+=4) {
-                //   a += f->w[((f_sx * fy)+fx)*f_depth] * V->w[((V_sx * oy)+ox)*f_depth];
-                //   a += f->w[((f_sx * fy)+fx)*f_depth+1] * V->w[((V_sx * oy)+ox)*f_depth+1];
-                //   a += f->w[((f_sx * fy)+fx)*f_depth+2] * V->w[((V_sx * oy)+ox)*f_depth+2];
-                //   a += f->w[((f_sx * fy)+fx)*f_depth+3] * V->w[((V_sx * oy)+ox)*f_depth+3];
-                // }
-                // for(fd=(fd/4)*4; fd < f_depth; fd++){
-                //   a += f->w[((f_sx * fy)+fx)*f_depth+fd] * V->w[((V_sx * oy)+ox)*f_depth+fd];
-                // }
               }
-            }
+          }
           }
           a += l_biases_wd;
           set_vol(A, ax, ay, d, a);
