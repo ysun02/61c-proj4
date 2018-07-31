@@ -260,7 +260,7 @@ A->w[((A->sx * ay) + ax)*A_depth+d] = a;
     }
   }
 }
-}
+
 uint64_t end1 = timestamp_us();
 
 total1 += end1-start1;
