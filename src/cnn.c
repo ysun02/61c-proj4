@@ -311,21 +311,21 @@ void conv_forward16(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
     V_depth = V->depth;
     A_depth = A->depth;
     //f needs a value
-    f = l->filters[0];
-    f_depth = f->depth;
+
+
     // else if(f_depth == 16){
       for(d = 0; d < l_out_depth; d++) {
         f = l->filters[d];
         f_sy = f->sy;
         f_sx = f->sx;
-
+        f_depth = f->depth;
         l_biases_wd = l->biases->w[d];
         l_out_sx = l->out_sx;
         l_out_sy = l->out_sy;
 
-        y = -2;
+        y = -l->pad;
         for(ay = 0; ay < l_out_sy; y += xy_stride, ay++) {
-          x = -2;
+          x = -l->pad;
           for(ax=0; ax < l_out_sx; x += xy_stride, ax++) {
             a = 0.0;
             for(fy = 0; fy < f_sy; fy++) {
@@ -428,14 +428,13 @@ void conv_forward20(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
     V_depth = V->depth;
     A_depth = A->depth;
     //f needs a value
-    f = l->filters[0];
-    f_depth = f->depth;
+
   //  else if(f_depth == 20){
       for(d = 0; d < l_out_depth; d++) {
         f = l->filters[d];
         f_sy = f->sy;
         f_sx = f->sx;
-
+        f_depth = f->depth;
         l_biases_wd = l->biases->w[d];
         l_out_sx = l->out_sx;
         l_out_sy = l->out_sy;
