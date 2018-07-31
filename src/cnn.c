@@ -249,10 +249,11 @@ void conv_forward3(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end)
                     break;
                   }
                   if(ox >=0) {
-
-      a += f->w[((f_sx * fy)+fx)*3] * V->w[((V_sx * oy)+ox)*V_depth];
-      a += f->w[((f_sx * fy)+fx)*3+1] * V->w[((V_sx * oy)+ox)*V_depth+1];
-      a += f->w[((f_sx * fy)+fx)*3+2] * V->w[((V_sx * oy)+ox)*V_depth+2];
+                    f_v = w[((f_sx * fy)+fx)*3];
+                    v_v = w[((V_sx * oy)+ox)*V_depth];
+      a += f->w[f_v] * V->w[v_v];
+      a += f->w[f_v+1] * V->w[v_v+1];
+      a += f->w[f_v+2] * V->w[v_v+2];
     }
   }
 }
