@@ -243,6 +243,7 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
                 ox = x + fx;
 
                 if(ox >=0 && ox < V_sx) {
+
                   if(f_depth == 3){
                     a += f->w[((f_sx * fy)+fx)*3] * V->w[((V_sx * oy)+ox)*V_depth];
                     a += f->w[((f_sx * fy)+fx)*3+1] * V->w[((V_sx * oy)+ox)*V_depth+1];
@@ -250,14 +251,16 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
                   }
 
                   else if(f_depth == 16){
-                    a += f->w[((f_sx * fy)+fx)*16+fd] * V->w[((V_sx * oy)+ox)*V_depth+fd];
-                    a += f->w[((f_sx * fy)+fx)*16+fd+1] * V->w[((V_sx * oy)+ox)*V_depth+fd+1];
-                    a += f->w[((f_sx * fy)+fx)*16+fd+2] * V->w[((V_sx * oy)+ox)*V_depth+fd+2];
-                    a += f->w[((f_sx * fy)+fx)*16+fd+3] * V->w[((V_sx * oy)+ox)*V_depth+fd+3];
-                    a += f->w[((f_sx * fy)+fx)*16+fd+4] * V->w[((V_sx * oy)+ox)*V_depth+fd+4];
-                    a += f->w[((f_sx * fy)+fx)*16+fd+5] * V->w[((V_sx * oy)+ox)*V_depth+fd+5];
-                    a += f->w[((f_sx * fy)+fx)*16+fd+6] * V->w[((V_sx * oy)+ox)*V_depth+fd+6];
-                    a += f->w[((f_sx * fy)+fx)*16+fd+7] * V->w[((V_sx * oy)+ox)*V_depth+fd+7];
+                    for(fd=0;fd < f_depth/8 * 8; fd+=8) {
+                      a += f->w[((f_sx * fy)+fx)*16+fd] * V->w[((V_sx * oy)+ox)*V_depth+fd];
+                      a += f->w[((f_sx * fy)+fx)*16+fd+1] * V->w[((V_sx * oy)+ox)*V_depth+fd+1];
+                      a += f->w[((f_sx * fy)+fx)*16+fd+2] * V->w[((V_sx * oy)+ox)*V_depth+fd+2];
+                      a += f->w[((f_sx * fy)+fx)*16+fd+3] * V->w[((V_sx * oy)+ox)*V_depth+fd+3];
+                      a += f->w[((f_sx * fy)+fx)*16+fd+4] * V->w[((V_sx * oy)+ox)*V_depth+fd+4];
+                      a += f->w[((f_sx * fy)+fx)*16+fd+5] * V->w[((V_sx * oy)+ox)*V_depth+fd+5];
+                      a += f->w[((f_sx * fy)+fx)*16+fd+6] * V->w[((V_sx * oy)+ox)*V_depth+fd+6];
+                      a += f->w[((f_sx * fy)+fx)*16+fd+7] * V->w[((V_sx * oy)+ox)*V_depth+fd+7];
+                  }
                   }
                   else if(f_depth == 20){
                         for(fd=0;fd < f_depth/8 * 8; fd+=8) {
