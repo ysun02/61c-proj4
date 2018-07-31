@@ -277,30 +277,32 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
                   }
                   else if(f_depth == 20){
 
-                    f_v = ((f_sx * fy))*20;
+                    f_v = ((f_sx * fy)+fx)*20;
                     v_v = ((V_sx * oy)+ox)*V_depth;
                     result = _mm256_setzero_pd();
 
-                    next_f = _mm256_loadu_pd((const double*) &f->w[f_v]);
-                    next_v = _mm256_loadu_pd((const double*) &V->w[v_v]);
+                    next_f = _mm256_loadu_pd((double const*) &f->w[f_v]);
+                    next_v = _mm256_loadu_pd((double const*) &V->w[v_v]);
                     result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
 
-                    next_f = _mm256_loadu_pd((const double*) &f->w[f_v+4]);
-                    next_v = _mm256_loadu_pd((const double*) &V->w[v_v+4]);
+                    next_f = _mm256_loadu_pd((double const*) &f->w[f_v+4]);
+                    next_v = _mm256_loadu_pd((double const*) &V->w[v_v+4]);
                     result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
 
-                    next_f = _mm256_loadu_pd((const double*) &f->w[f_v+8]);
-                    next_v = _mm256_loadu_pd((const double*) &V->w[v_v+8]);
+                    next_f = _mm256_loadu_pd((double const*) &f->w[f_v+8]);
+                    next_v = _mm256_loadu_pd((double const*) &V->w[v_v+8]);
                     result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
 
-                    next_f = _mm256_loadu_pd((const double*) &f->w[f_v+12]);
-                    next_v = _mm256_loadu_pd((const double*) &V->w[v_v+12]);
+                    next_f = _mm256_loadu_pd((double const*) &f->w[f_v+12]);
+                    next_v = _mm256_loadu_pd((double const*) &V->w[v_v+12]);
                     result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
 
-                    next_f = _mm256_loadu_pd((const double*) &f->w[f_v+16]);
-                    next_v = _mm256_loadu_pd((const double*) &V->w[v_v+16]);
+                    next_f = _mm256_loadu_pd((double const*) &f->w[f_v+16]);
+                    next_v = _mm256_loadu_pd((double const*) &V->w[v_v+16]);
                     result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
+
                     _mm256_store_pd(part, result);
+
                     a = a + part[0] + part[1] + part[2] + part[3];
 
                   }
