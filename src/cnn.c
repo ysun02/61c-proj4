@@ -889,9 +889,10 @@ void net_forward(network_t* net, batch_t* v, int start, int end) {
 
 #define CAT_LABEL 3
 void net_classify_cats(network_t* net, vol_t** input, double* output, int n) {
-  batch_t* batch = make_batch(net, 8);
+
   #pragma omp parallel
   {
+    batch_t* batch = make_batch(net, 8);
   #pragma omp for
   for (int i = 0; i < n/8 * 8; i+=8) {
     batch_t image_0 = batch[0];
