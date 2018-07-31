@@ -368,9 +368,9 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
                   //   a += f->w[f_v+fd] * V->w[v_v+fd];
                   // }
                 }
-              }
-            }
-          }
+
+
+
           a += l_biases_wd;
           set_vol(A, ax, ay, d, a);
         }
@@ -382,6 +382,7 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
     total1 += end1-start1;
 
 
+}
 }
 
 void conv_load(conv_layer_t* l, const char* fn) {
