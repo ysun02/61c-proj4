@@ -313,79 +313,80 @@ void conv_forward16(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
     //f needs a value
     f = l->filters[0];
     f_depth = f->depth;
-                  // else if(f_depth == 16){
-                    for(d = 0; d < l_out_depth; d++) {
-                      f = l->filters[d];
-                      f_sy = f->sy;
-                      f_sx = f->sx;
+    // else if(f_depth == 16){
+    y = -2;
+    for(ay = 0; ay < l_out_sy; y += xy_stride, ay++) {
+      x = -2;
+      for(ax=0; ax < l_out_sx; x += xy_stride, ax++) {
+      for(d = 0; d < l_out_depth; d++) {
+        f = l->filters[d];
+        f_sy = f->sy;
+        f_sx = f->sx;
 
-                      l_biases_wd = l->biases->w[d];
-                      l_out_sx = l->out_sx;
-                      l_out_sy = l->out_sy;
-
-                      y = -2;
-                      for(ay = 0; ay < l_out_sy; y += xy_stride, ay++) {
-                        x = -2;
-                        for(ax=0; ax < l_out_sx; x += xy_stride, ax++) {
-                          a = 0.0;
-                          for(fy = 0; fy < f_sy; fy++) {
-                            oy = y + fy;
-
-                            if(oy >= V_sy){
-                              break;
-                            }
-                            if(oy >= 0){
-
-                              for(fx = 0; fx < f_sx; fx++) {
-                                ox = x + fx;
-
-                                if(ox >= V_sx){
-                                  break;
-                                }
-                                if(ox >=0) {
+        l_biases_wd = l->biases->w[d];
+        l_out_sx = l->out_sx;
+        l_out_sy = l->out_sy;
 
 
+            a = 0.0;
+            for(fy = 0; fy < f_sy; fy++) {
+              oy = y + fy;
 
-                    f_v = ((f_sx * fy)+fx)*16;
-                    v_v = ((V_sx * oy)+ox)*V_depth;
-                    result = _mm256_setzero_pd();
+              if(oy >= V_sy){
+                break;
+              }
+              if(oy >= 0){
 
-                    next_f = _mm256_loadu_pd((double const*) &f->w[f_v]);
-                    next_v = _mm256_loadu_pd((double const*) &V->w[v_v]);
-                    result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
+                for(fx = 0; fx < f_sx; fx++) {
+                  ox = x + fx;
 
-                    next_f = _mm256_loadu_pd((double const*) &f->w[f_v+4]);
-                    next_v = _mm256_loadu_pd((double const*) &V->w[v_v+4]);
-                    result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
-
-                    next_f = _mm256_loadu_pd((double const*) &f->w[f_v+8]);
-                    next_v = _mm256_loadu_pd((double const*) &V->w[v_v+8]);
-                    result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
-
-                    next_f = _mm256_loadu_pd((double const*) &f->w[f_v+12]);
-                    next_v = _mm256_loadu_pd((double const*) &V->w[v_v+12]);
-                    result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
-
-                    _mm256_store_pd(part, result);
-
-                    a = a + part[0] + part[1] + part[2] + part[3];
-
-                    }
-                    }
-                    }
-                    }
-
-                    a += l_biases_wd;
-                    A->w[((A->sx * ay) + ax)*A_depth+d] = a;
+                  if(ox >= V_sx){
+                    break;
                   }
-                  }
-                  }
-                }
-                  uint64_t end1 = timestamp_us();
+                  if(ox >=0) {
 
-                  total1 += end1-start1;
 
-                  }
+
+      f_v = ((f_sx * fy)+fx)*16;
+      v_v = ((V_sx * oy)+ox)*V_depth;
+      result = _mm256_setzero_pd();
+
+      next_f = _mm256_loadu_pd((double const*) &f->w[f_v]);
+      next_v = _mm256_loadu_pd((double const*) &V->w[v_v]);
+      result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
+
+      next_f = _mm256_loadu_pd((double const*) &f->w[f_v+4]);
+      next_v = _mm256_loadu_pd((double const*) &V->w[v_v+4]);
+      result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
+
+      next_f = _mm256_loadu_pd((double const*) &f->w[f_v+8]);
+      next_v = _mm256_loadu_pd((double const*) &V->w[v_v+8]);
+      result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
+
+      next_f = _mm256_loadu_pd((double const*) &f->w[f_v+12]);
+      next_v = _mm256_loadu_pd((double const*) &V->w[v_v+12]);
+      result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
+
+      _mm256_store_pd(part, result);
+
+      a = a + part[0] + part[1] + part[2] + part[3];
+
+      }
+      }
+      }
+      }
+
+      a += l_biases_wd;
+      A->w[((A->sx * ay) + ax)*A_depth+d] = a;
+    }
+    }
+    }
+  }
+    uint64_t end1 = timestamp_us();
+
+    total1 += end1-start1;
+
+    }
 void conv_forward20(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) {
     uint64_t start1 = timestamp_us();
 
@@ -430,85 +431,85 @@ void conv_forward20(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
     //f needs a value
     f = l->filters[0];
     f_depth = f->depth;
-                //  else if(f_depth == 20){
-                    for(d = 0; d < l_out_depth; d++) {
-                      f = l->filters[d];
-                      f_sy = f->sy;
-                      f_sx = f->sx;
+  //  else if(f_depth == 20){
+      for(d = 0; d < l_out_depth; d++) {
+        f = l->filters[d];
+        f_sy = f->sy;
+        f_sx = f->sx;
 
-                      l_biases_wd = l->biases->w[d];
-                      l_out_sx = l->out_sx;
-                      l_out_sy = l->out_sy;
+        l_biases_wd = l->biases->w[d];
+        l_out_sx = l->out_sx;
+        l_out_sy = l->out_sy;
 
-                      y = -2;
-                      for(ay = 0; ay < l_out_sy; y += xy_stride, ay++) {
-                        x = -2;
-                        for(ax=0; ax < l_out_sx; x += xy_stride, ax++) {
-                          a = 0.0;
-                          for(fy = 0; fy < f_sy; fy++) {
-                            oy = y + fy;
+        y = -2;
+        for(ay = 0; ay < l_out_sy; y += xy_stride, ay++) {
+          x = -2;
+          for(ax=0; ax < l_out_sx; x += xy_stride, ax++) {
+            a = 0.0;
+            for(fy = 0; fy < f_sy; fy++) {
+              oy = y + fy;
 
-                            if(oy >= V_sy){
-                              break;
-                            }
-                            if(oy >= 0){
+              if(oy >= V_sy){
+                break;
+              }
+              if(oy >= 0){
 
-                              for(fx = 0; fx < f_sx; fx++) {
-                                ox = x + fx;
+                for(fx = 0; fx < f_sx; fx++) {
+                  ox = x + fx;
 
-                                if(ox >= V_sx){
-                                  break;
-                                }
-                                if(ox >=0) {
-
-
-
-                    f_v = ((f_sx * fy)+fx)*20;
-                    v_v = ((V_sx * oy)+ox)*V_depth;
-                    result = _mm256_setzero_pd();
-
-                    next_f = _mm256_loadu_pd((double const*) &f->w[f_v]);
-                    next_v = _mm256_loadu_pd((double const*) &V->w[v_v]);
-                    result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
-
-                    next_f = _mm256_loadu_pd((double const*) &f->w[f_v+4]);
-                    next_v = _mm256_loadu_pd((double const*) &V->w[v_v+4]);
-                    result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
-
-                    next_f = _mm256_loadu_pd((double const*) &f->w[f_v+8]);
-                    next_v = _mm256_loadu_pd((double const*) &V->w[v_v+8]);
-                    result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
-
-                    next_f = _mm256_loadu_pd((double const*) &f->w[f_v+12]);
-                    next_v = _mm256_loadu_pd((double const*) &V->w[v_v+12]);
-                    result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
-
-                    next_f = _mm256_loadu_pd((double const*) &f->w[f_v+16]);
-                    next_v = _mm256_loadu_pd((double const*) &V->w[v_v+16]);
-                    result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
-
-                    _mm256_store_pd(part, result);
-
-                    a = a + part[0] + part[1] + part[2] + part[3];
-
-
-                      }
-                    }
+                  if(ox >= V_sx){
+                    break;
                   }
-                }
+                  if(ox >=0) {
 
-          a += l_biases_wd;
-          A->w[((A->sx * ay) + ax)*A_depth+d] = a;
 
+
+      f_v = ((f_sx * fy)+fx)*20;
+      v_v = ((V_sx * oy)+ox)*V_depth;
+      result = _mm256_setzero_pd();
+
+      next_f = _mm256_loadu_pd((double const*) &f->w[f_v]);
+      next_v = _mm256_loadu_pd((double const*) &V->w[v_v]);
+      result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
+
+      next_f = _mm256_loadu_pd((double const*) &f->w[f_v+4]);
+      next_v = _mm256_loadu_pd((double const*) &V->w[v_v+4]);
+      result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
+
+      next_f = _mm256_loadu_pd((double const*) &f->w[f_v+8]);
+      next_v = _mm256_loadu_pd((double const*) &V->w[v_v+8]);
+      result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
+
+      next_f = _mm256_loadu_pd((double const*) &f->w[f_v+12]);
+      next_v = _mm256_loadu_pd((double const*) &V->w[v_v+12]);
+      result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
+
+      next_f = _mm256_loadu_pd((double const*) &f->w[f_v+16]);
+      next_v = _mm256_loadu_pd((double const*) &V->w[v_v+16]);
+      result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
+
+      _mm256_store_pd(part, result);
+
+      a = a + part[0] + part[1] + part[2] + part[3];
 
 
         }
       }
     }
-    }
-    uint64_t end1 = timestamp_us();
+  }
 
-    total1 += end1-start1;
+a += l_biases_wd;
+A->w[((A->sx * ay) + ax)*A_depth+d] = a;
+
+
+
+}
+}
+}
+}
+uint64_t end1 = timestamp_us();
+
+total1 += end1-start1;
 
 }
 
