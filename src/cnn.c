@@ -314,10 +314,6 @@ void conv_forward16(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
     f = l->filters[0];
     f_depth = f->depth;
     // else if(f_depth == 16){
-    y = -2;
-    for(ay = 0; ay < l_out_sy; y += xy_stride, ay++) {
-      x = -2;
-      for(ax=0; ax < l_out_sx; x += xy_stride, ax++) {
       for(d = 0; d < l_out_depth; d++) {
         f = l->filters[d];
         f_sy = f->sy;
@@ -327,7 +323,10 @@ void conv_forward16(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
         l_out_sx = l->out_sx;
         l_out_sy = l->out_sy;
 
-
+        y = -2;
+        for(ay = 0; ay < l_out_sy; y += xy_stride, ay++) {
+          x = -2;
+          for(ax=0; ax < l_out_sx; x += xy_stride, ax++) {
             a = 0.0;
             for(fy = 0; fy < f_sy; fy++) {
               oy = y + fy;
