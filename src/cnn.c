@@ -238,60 +238,6 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
               break;
             }
             if(oy >= 0){
-              // sx always 5, assume fx to be 0;
-              // ox = x;
-              // if(ox >= 0 && ox+4 < V_sx){
-              //   f_v = ((f_sx * fy))*3;
-              //   v_v = ((V_sx * oy)+ox)*V_depth;
-              //   result = _mm256_setzero_pd();
-              //   next_f = _mm256_loadu_pd((double const*) &f->w[f_v]);
-              //   next_v = _mm256_loadu_pd((double const*) &V->w[v_v]);
-              //   result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
-              //
-              //   next_f = _mm256_loadu_pd((double const*) &f->w[f_v+4]);
-              //   next_v = _mm256_loadu_pd((double const*) &V->w[v_v+4]);
-              //   result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
-              //
-              //   next_f = _mm256_loadu_pd((double const*) &f->w[f_v+8]);
-              //   next_v = _mm256_loadu_pd((double const*) &V->w[v_v+8]);
-              //   result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
-              //
-              //   _mm256_store_pd(part, result);
-              //   a = a + part[0] + part[1] + part[2] + part[3];
-              //
-              //   a += f->w[f_v + 12] * V->w[v_v + 12];
-              //   a += f->w[f_v + 13] * V->w[v_v + 13];
-              //   a += f->w[f_v + 14] * V->w[v_v + 14];
-              // }
-              //
-              // else if(ox >= 0 && ox+3 < V_sx){
-              //   f_v = ((f_sx * fy))*3;
-              //   v_v = ((V_sx * oy)+ox)*V_depth;
-              //   result = _mm256_setzero_pd();
-              //   next_f = _mm256_loadu_pd((double const*) &f->w[f_v]);
-              //   next_v = _mm256_loadu_pd((double const*) &V->w[v_v]);
-              //   result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
-              //
-              //   next_f = _mm256_loadu_pd((double const*) &f->w[f_v+4]);
-              //   next_v = _mm256_loadu_pd((double const*) &V->w[v_v+4]);
-              //   result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
-              //
-              //   _mm256_store_pd(partial, return_v);
-              //   a = a + part[0] + part[1] + part[2] + part[3];
-              //
-              //   a += f->w[f_v + 8] * V->w[v_v + 8];
-              //
-              //   if(ox+3 >= V_sx){
-              //     continue;
-              //   }
-              //   a += f->w[f_v + 9] * V->w[v_v + 9];
-              //   a += f->w[f_v + 10] * V->w[v_v + 10];
-              //   a += f->w[f_v + 11] * V->w[v_v + 11];
-              //
-              //   next_f = _mm256_loadu_pd((double const*) &f->w[f_v+8]);
-              //   next_v = _mm256_loadu_pd((double const*) &V->w[v_v+8]);
-              //   result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
-              // }
               if(f_depth == 3){
               for(fx = 0; fx < f_sx; fx++) {
                 ox = x + fx;
@@ -345,29 +291,9 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
                 }
               }
                 }
-            // for(fx = 0; fx < f_sx; fx++) {
-            //   ox = x + fx;
-            //
-            //   if(ox >=0 && ox < V_sx) {
-            //     for(fd=0;fd < f_depth; fd++) {
-            //       a += f->w[((f_sx * fy)+fx)*f_depth+fd] * V->w[((V_sx * oy)+ox)*V_depth+fd];
-            //     }
 
-                  // for(fd=0; fd < f_depth/4 * 4; fd+=4) {
-
-
-
-                  //   a += f->w[f_v] * V->w[v_v];
-                  //   a += f->w[f_v+1] * V->w[v_v+1];
-                  //   a += f->w[f_v+2] * V->w[v_v+2];
-                  //   a += f->w[f_v+3] * V->w[v_v+3];
-                  //
-                  // }
-
-                  // for(fd=(f_depth/4)*4; fd < f_depth; fd++){
-                  //   a += f->w[f_v+fd] * V->w[v_v+fd];
-                  // }
                 }
+              }
 
 
 
@@ -383,7 +309,7 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
 
 
 }
-}
+
 
 void conv_load(conv_layer_t* l, const char* fn) {
   int sx, sy, depth, filters;
