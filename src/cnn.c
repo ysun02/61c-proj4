@@ -921,12 +921,15 @@ void net_classify_cats(network_t* net, vol_t** input, double* output, int n) {
 
 
 }
+#pragma omp parallel
+{
   for (int i = n/8 * 8; i < n; i++){
     copy_vol(batch[0][0], input[i]);
     net_forward(net, batch, 0, 0);
     output[i] = batch[11][0]->w[CAT_LABEL];
   }
   free_batch(batch, 8);
+}
   printf("%s", "forward: ");
   printf("%" PRIu64 "\n", total1);
   printf("%s", "relu: ");
