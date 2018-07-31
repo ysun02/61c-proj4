@@ -324,22 +324,7 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
                     _mm256_store_pd(part, result);
 
                     a = a + part[0] + part[1] + part[2] + part[3];
-                      // a += f->w[((f_sx * fy)+fx)*16] * V->w[((V_sx * oy)+ox)*V_depth];
-                      // a += f->w[((f_sx * fy)+fx)*16+1] * V->w[((V_sx * oy)+ox)*V_depth+1];
-                      // a += f->w[((f_sx * fy)+fx)*16+2] * V->w[((V_sx * oy)+ox)*V_depth+2];
-                      // a += f->w[((f_sx * fy)+fx)*16+3] * V->w[((V_sx * oy)+ox)*V_depth+3];
-                      // a += f->w[((f_sx * fy)+fx)*16+4] * V->w[((V_sx * oy)+ox)*V_depth+4];
-                      // a += f->w[((f_sx * fy)+fx)*16+5] * V->w[((V_sx * oy)+ox)*V_depth+5];
-                      // a += f->w[((f_sx * fy)+fx)*16+6] * V->w[((V_sx * oy)+ox)*V_depth+6];
-                      // a += f->w[((f_sx * fy)+fx)*16+7] * V->w[((V_sx * oy)+ox)*V_depth+7];
-                      // a += f->w[((f_sx * fy)+fx)*16+8] * V->w[((V_sx * oy)+ox)*V_depth+8];
-                      // a += f->w[((f_sx * fy)+fx)*16+9] * V->w[((V_sx * oy)+ox)*V_depth+9];
-                      // a += f->w[((f_sx * fy)+fx)*16+10] * V->w[((V_sx * oy)+ox)*V_depth+10];
-                      // a += f->w[((f_sx * fy)+fx)*16+11] * V->w[((V_sx * oy)+ox)*V_depth+11];
-                      // a += f->w[((f_sx * fy)+fx)*16+12] * V->w[((V_sx * oy)+ox)*V_depth+12];
-                      // a += f->w[((f_sx * fy)+fx)*16+13] * V->w[((V_sx * oy)+ox)*V_depth+13];
-                      // a += f->w[((f_sx * fy)+fx)*16+14] * V->w[((V_sx * oy)+ox)*V_depth+14];
-                      // a += f->w[((f_sx * fy)+fx)*16+15] * V->w[((V_sx * oy)+ox)*V_depth+15];
+
                     }
                     }
                     }
@@ -413,29 +398,6 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
                     _mm256_store_pd(part, result);
 
                     a = a + part[0] + part[1] + part[2] + part[3];
-
-
-                          // a += f->w[((f_sx * fy)+fx)*20] * V->w[((V_sx * oy)+ox)*V_depth];
-                          // a += f->w[((f_sx * fy)+fx)*20+1] * V->w[((V_sx * oy)+ox)*V_depth+1];
-                          // a += f->w[((f_sx * fy)+fx)*20+2] * V->w[((V_sx * oy)+ox)*V_depth+2];
-                          // a += f->w[((f_sx * fy)+fx)*20+3] * V->w[((V_sx * oy)+ox)*V_depth+3];
-                          // a += f->w[((f_sx * fy)+fx)*20+4] * V->w[((V_sx * oy)+ox)*V_depth+4];
-                          // a += f->w[((f_sx * fy)+fx)*20+5] * V->w[((V_sx * oy)+ox)*V_depth+5];
-                          // a += f->w[((f_sx * fy)+fx)*20+6] * V->w[((V_sx * oy)+ox)*V_depth+6];
-                          // a += f->w[((f_sx * fy)+fx)*20+7] * V->w[((V_sx * oy)+ox)*V_depth+7];
-                          // a += f->w[((f_sx * fy)+fx)*20+8] * V->w[((V_sx * oy)+ox)*V_depth+8];
-                          // a += f->w[((f_sx * fy)+fx)*20+9] * V->w[((V_sx * oy)+ox)*V_depth+9];
-                          // a += f->w[((f_sx * fy)+fx)*20+10] * V->w[((V_sx * oy)+ox)*V_depth+10];
-                          // a += f->w[((f_sx * fy)+fx)*20+11] * V->w[((V_sx * oy)+ox)*V_depth+11];
-                          // a += f->w[((f_sx * fy)+fx)*20+12] * V->w[((V_sx * oy)+ox)*V_depth+12];
-                          // a += f->w[((f_sx * fy)+fx)*20+13] * V->w[((V_sx * oy)+ox)*V_depth+13];
-                          // a += f->w[((f_sx * fy)+fx)*20+14] * V->w[((V_sx * oy)+ox)*V_depth+14];
-                          // a += f->w[((f_sx * fy)+fx)*20+15] * V->w[((V_sx * oy)+ox)*V_depth+15];
-                          // a += f->w[((f_sx * fy)+fx)*20+16] * V->w[((V_sx * oy)+ox)*V_depth+16];
-                          // a += f->w[((f_sx * fy)+fx)*20+17] * V->w[((V_sx * oy)+ox)*V_depth+17];
-                          // a += f->w[((f_sx * fy)+fx)*20+18] * V->w[((V_sx * oy)+ox)*V_depth+18];
-                          // a += f->w[((f_sx * fy)+fx)*20+19] * V->w[((V_sx * oy)+ox)*V_depth+19];
-
 
 
                       }
@@ -927,12 +889,42 @@ void net_forward(network_t* net, batch_t* v, int start, int end) {
 
 #define CAT_LABEL 3
 void net_classify_cats(network_t* net, vol_t** input, double* output, int n) {
-  batch_t* batch = make_batch(net, 1);
+  #pragma omp parallel
+  {
+  batch_t* batch = make_batch(net, 8);
 
-  for (int i = 0; i < n; i++) {
+  #pragma omp for
+
+  for (int i = 0; i < n/8 * 8; i+=8) {
+    batch_t image_0 = batch[0];
+
+    copy_vol(image_0[0], input[i]);
+    copy_vol(image_0[1], input[i+1]);
+    copy_vol(image_0[2], input[i+2]);
+    copy_vol(image_0[3], input[i+3]);
+    copy_vol(image_0[4], input[i+4]);
+    copy_vol(image_0[5], input[i+5]);
+    copy_vol(image_0[6], input[i+6]);
+    copy_vol(image_0[7], input[i+7]);
+
+    net_forward(net, batch, 0, 7);
+
+    batch_t image_11 = batch[11];
+
+    output[i] = image_11[0]->w[CAT_LABEL];
+    output[i+1] = image_11[1]->w[CAT_LABEL];
+    output[i+2] = image_11[2]->w[CAT_LABEL];
+    output[i+3] = image_11[3]->w[CAT_LABEL];
+    output[i+4] = image_11[4]->w[CAT_LABEL];
+    output[i+5] = image_11[5]->w[CAT_LABEL];
+    output[i+6] = image_11[6]->w[CAT_LABEL];
+    output[i+7] = image_11[7]->w[CAT_LABEL];
+  }
+  for (int i = n/8 * 8; i < n; i++){
     copy_vol(batch[0][0], input[i]);
     net_forward(net, batch, 0, 0);
     output[i] = batch[11][0]->w[CAT_LABEL];
+
   }
   printf("%s", "forward: ");
   printf("%" PRIu64 "\n", total1);
@@ -945,6 +937,7 @@ void net_classify_cats(network_t* net, vol_t** input, double* output, int n) {
   printf("%s", "softmax: ");
   printf("%" PRIu64 "\n", total5);
   free_batch(batch, 1);
+}
 }
 
 // IGNORE EVERYTHING BELOW THIS POINT -----------------------------------------
