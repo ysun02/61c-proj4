@@ -258,22 +258,45 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
 
                   else if(f_depth == 16){
 
-                      a += f->w[((f_sx * fy)+fx)*16] * V->w[((V_sx * oy)+ox)*V_depth];
-                      a += f->w[((f_sx * fy)+fx)*16+1] * V->w[((V_sx * oy)+ox)*V_depth+1];
-                      a += f->w[((f_sx * fy)+fx)*16+2] * V->w[((V_sx * oy)+ox)*V_depth+2];
-                      a += f->w[((f_sx * fy)+fx)*16+3] * V->w[((V_sx * oy)+ox)*V_depth+3];
-                      a += f->w[((f_sx * fy)+fx)*16+4] * V->w[((V_sx * oy)+ox)*V_depth+4];
-                      a += f->w[((f_sx * fy)+fx)*16+5] * V->w[((V_sx * oy)+ox)*V_depth+5];
-                      a += f->w[((f_sx * fy)+fx)*16+6] * V->w[((V_sx * oy)+ox)*V_depth+6];
-                      a += f->w[((f_sx * fy)+fx)*16+7] * V->w[((V_sx * oy)+ox)*V_depth+7];
-                      a += f->w[((f_sx * fy)+fx)*16+8] * V->w[((V_sx * oy)+ox)*V_depth+8];
-                      a += f->w[((f_sx * fy)+fx)*16+9] * V->w[((V_sx * oy)+ox)*V_depth+9];
-                      a += f->w[((f_sx * fy)+fx)*16+10] * V->w[((V_sx * oy)+ox)*V_depth+10];
-                      a += f->w[((f_sx * fy)+fx)*16+11] * V->w[((V_sx * oy)+ox)*V_depth+11];
-                      a += f->w[((f_sx * fy)+fx)*16+12] * V->w[((V_sx * oy)+ox)*V_depth+12];
-                      a += f->w[((f_sx * fy)+fx)*16+13] * V->w[((V_sx * oy)+ox)*V_depth+13];
-                      a += f->w[((f_sx * fy)+fx)*16+14] * V->w[((V_sx * oy)+ox)*V_depth+14];
-                      a += f->w[((f_sx * fy)+fx)*16+15] * V->w[((V_sx * oy)+ox)*V_depth+15];
+                    f_v = ((f_sx * fy)+fx)*16;
+                    v_v = ((V_sx * oy)+ox)*V_depth;
+                    result = _mm256_setzero_pd();
+
+                    next_f = _mm256_loadu_pd((double const*) &f->w[f_v]);
+                    next_v = _mm256_loadu_pd((double const*) &V->w[v_v]);
+                    result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
+
+                    next_f = _mm256_loadu_pd((double const*) &f->w[f_v+4]);
+                    next_v = _mm256_loadu_pd((double const*) &V->w[v_v+4]);
+                    result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
+
+                    next_f = _mm256_loadu_pd((double const*) &f->w[f_v+8]);
+                    next_v = _mm256_loadu_pd((double const*) &V->w[v_v+8]);
+                    result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
+
+                    next_f = _mm256_loadu_pd((double const*) &f->w[f_v+12]);
+                    next_v = _mm256_loadu_pd((double const*) &V->w[v_v+12]);
+                    result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
+
+                    _mm256_store_pd(part, result);
+
+                    a = a + part[0] + part[1] + part[2] + part[3];
+                      // a += f->w[((f_sx * fy)+fx)*16] * V->w[((V_sx * oy)+ox)*V_depth];
+                      // a += f->w[((f_sx * fy)+fx)*16+1] * V->w[((V_sx * oy)+ox)*V_depth+1];
+                      // a += f->w[((f_sx * fy)+fx)*16+2] * V->w[((V_sx * oy)+ox)*V_depth+2];
+                      // a += f->w[((f_sx * fy)+fx)*16+3] * V->w[((V_sx * oy)+ox)*V_depth+3];
+                      // a += f->w[((f_sx * fy)+fx)*16+4] * V->w[((V_sx * oy)+ox)*V_depth+4];
+                      // a += f->w[((f_sx * fy)+fx)*16+5] * V->w[((V_sx * oy)+ox)*V_depth+5];
+                      // a += f->w[((f_sx * fy)+fx)*16+6] * V->w[((V_sx * oy)+ox)*V_depth+6];
+                      // a += f->w[((f_sx * fy)+fx)*16+7] * V->w[((V_sx * oy)+ox)*V_depth+7];
+                      // a += f->w[((f_sx * fy)+fx)*16+8] * V->w[((V_sx * oy)+ox)*V_depth+8];
+                      // a += f->w[((f_sx * fy)+fx)*16+9] * V->w[((V_sx * oy)+ox)*V_depth+9];
+                      // a += f->w[((f_sx * fy)+fx)*16+10] * V->w[((V_sx * oy)+ox)*V_depth+10];
+                      // a += f->w[((f_sx * fy)+fx)*16+11] * V->w[((V_sx * oy)+ox)*V_depth+11];
+                      // a += f->w[((f_sx * fy)+fx)*16+12] * V->w[((V_sx * oy)+ox)*V_depth+12];
+                      // a += f->w[((f_sx * fy)+fx)*16+13] * V->w[((V_sx * oy)+ox)*V_depth+13];
+                      // a += f->w[((f_sx * fy)+fx)*16+14] * V->w[((V_sx * oy)+ox)*V_depth+14];
+                      // a += f->w[((f_sx * fy)+fx)*16+15] * V->w[((V_sx * oy)+ox)*V_depth+15];
 
 
 
