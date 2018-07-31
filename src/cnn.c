@@ -242,9 +242,13 @@ void conv_forward3(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end)
               }
               if(oy >= 0){
 
-                for(fx = -x; fx < f_sx && (x+fx) < V_sx; fx++) {
+                for(fx = -x; fx < f_sx; fx++) {
                   ox = x + fx;
-}
+
+                  if(ox >= V_sx){
+                    break;
+                  }
+
                     f_v = ((f_sx * fy)+fx)*3;
                     v_v = ((V_sx * oy)+ox)*V_depth;
       a += f->w[f_v] * V->w[v_v];
@@ -260,7 +264,7 @@ A->w[((A->sx * ay) + ax)*A_depth+d] = a;
     }
   }
 }
-
+}
 uint64_t end1 = timestamp_us();
 
 total1 += end1-start1;
@@ -488,10 +492,10 @@ void conv_forward20(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
       a = a + part[0] + part[1] + part[2] + part[3];
 
 
-
+        }
       }
     }
-  }
+
 
 a += l_biases_wd;
 A->w[((A->sx * ay) + ax)*A_depth+d] = a;
