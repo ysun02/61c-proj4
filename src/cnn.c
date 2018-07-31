@@ -242,19 +242,19 @@ void conv_forward3(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end)
               }
               if(oy >= 0){
 
-                for(fx = 0; fx < f_sx; fx++) {
+                for(fx = -x; fx < f_sx; fx++) {
                   ox = x + fx;
 
                   if(ox >= V_sx){
                     break;
                   }
-                  if(ox >=0) {
+
                     f_v = ((f_sx * fy)+fx)*3;
                     v_v = ((V_sx * oy)+ox)*V_depth;
       a += f->w[f_v] * V->w[v_v];
       a += f->w[f_v+1] * V->w[v_v+1];
       a += f->w[f_v+2] * V->w[v_v+2];
-    }
+
   }
 }
 }
@@ -337,13 +337,13 @@ void conv_forward16(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
               }
               if(oy >= 0){
 
-                for(fx = 0; fx < f_sx; fx++) {
+                for(fx = -x; fx < f_sx; fx++) {
                   ox = x + fx;
 
                   if(ox >= V_sx){
                     break;
                   }
-                  if(ox >=0) {
+
 
 
 
@@ -371,7 +371,7 @@ void conv_forward16(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
 
       a = a + part[0] + part[1] + part[2] + part[3];
 
-      }
+
       }
       }
       }
@@ -453,13 +453,13 @@ void conv_forward20(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
               }
               if(oy >= 0){
 
-                for(fx = 0; fx < f_sx; fx++) {
+                for(fx = -x; fx < f_sx; fx++) {
                   ox = x + fx;
 
                   if(ox >= V_sx){
                     break;
                   }
-                  if(ox >=0) {
+
 
 
 
@@ -492,7 +492,7 @@ void conv_forward20(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
       a = a + part[0] + part[1] + part[2] + part[3];
 
 
-        }
+        
       }
     }
   }
