@@ -197,7 +197,7 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
 
     int V_sx;
     int V_sy;
-    int f_depth, V_depth;
+    int f_depth, V_depth, A_depth;
     int l_out_depth;
 
     __m256d next_v;
@@ -222,6 +222,7 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
 
       f_depth = f->depth;
       V_depth = V->depth;
+      A_depth = A->depth;
       l_biases_wd = l->biases->w[d];
       l_out_sx = l->out_sx;
       l_out_sy = l->out_sy;
@@ -343,7 +344,10 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
 
 
           a += l_biases_wd;
-          set_vol(A, ax, ay, d, a);
+          A->w[((A->sx * ay) + ax)*A_depth+d] = a;
+
+
+
         }
       }
     }
