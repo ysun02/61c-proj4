@@ -248,13 +248,13 @@ void conv_forward3(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end)
                   if(ox >= V_sx){
                     break;
                   }
-                  //if(ox >=0) {
+                  if(ox >=0) {
                     f_v = ((f_sx * fy)+fx)*3;
                     v_v = ((V_sx * oy)+ox)*V_depth;
       a += f->w[f_v] * V->w[v_v];
       a += f->w[f_v+1] * V->w[v_v+1];
       a += f->w[f_v+2] * V->w[v_v+2];
-    //}
+    }
   }
 }
 }
