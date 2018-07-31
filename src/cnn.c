@@ -173,7 +173,103 @@ conv_layer_t* make_conv_layer(int in_sx, int in_sy, int in_depth,
   return l;
 }
 
-void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) {
+void conv_forward3(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) {
+    uint64_t start1 = timestamp_us();
+
+    int xy_stride;
+    int x;
+    int y;
+    int oy, ox;
+    int l_out_sx;
+    int l_out_sy;
+    int f_sy, f_sx;
+    int fx, fy, fd;
+    int ay, ax;
+    int i, d;
+    int f_v, v_v;
+
+    double a;
+    double l_biases_wd;
+
+    vol_t* V;
+    vol_t* A;
+    vol_t* f;
+
+    int V_sx;
+    int V_sy;
+    int f_depth, V_depth, A_depth;
+    int l_out_depth;
+
+    __m256d next_v;
+    __m256d next_f;
+    __m256d result;
+    double part[4];
+
+    for (i = start; i <= end; i++) {
+    V = in[i];
+    A = out[i];
+    V_sx = V->sx;
+    V_sy = V->sy;
+    l_out_depth = l->out_depth;
+    xy_stride = l->stride;
+    V_depth = V->depth;
+    A_depth = A->depth;
+    //f needs a value
+    // f = l->filters[0];
+    // f_depth = f->depth;
+
+  //  if(f_depth == 3){
+      for(d = 0; d < l_out_depth; d++) {
+        f = l->filters[d];
+        f_depth = f->depth;
+        f_sy = f->sy;
+        f_sx = f->sx;
+
+        l_biases_wd = l->biases->w[d];
+        l_out_sx = l->out_sx;
+        l_out_sy = l->out_sy;
+
+        y = -2;
+        for(ay = 0; ay < l_out_sy; y += xy_stride, ay++) {
+          x = -2;
+          for(ax=0; ax < l_out_sx; x += xy_stride, ax++) {
+            a = 0.0;
+            for(fy = 0; fy < f_sy; fy++) {
+              oy = y + fy;
+
+              if(oy >= V_sy){
+                break;
+              }
+              if(oy >= 0){
+
+                for(fx = 0; fx < f_sx; fx++) {
+                  ox = x + fx;
+
+                  if(ox >= V_sx){
+                    break;
+                  }
+                  if(ox >=0) {
+
+      a += f->w[((f_sx * fy)+fx)*3] * V->w[((V_sx * oy)+ox)*V_depth];
+      a += f->w[((f_sx * fy)+fx)*3+1] * V->w[((V_sx * oy)+ox)*V_depth+1];
+      a += f->w[((f_sx * fy)+fx)*3+2] * V->w[((V_sx * oy)+ox)*V_depth+2];
+    }
+  }
+}
+}
+
+a += l_biases_wd;
+A->w[((A->sx * ay) + ax)*A_depth+d] = a;
+    }
+  }
+}
+}
+uint64_t end1 = timestamp_us();
+
+total1 += end1-start1;
+}
+
+void conv_forward16(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) {
     uint64_t start1 = timestamp_us();
 
     int xy_stride;
@@ -217,53 +313,7 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
     //f needs a value
     f = l->filters[0];
     f_depth = f->depth;
-
-
-
-                  if(f_depth == 3){
-                    for(d = 0; d < l_out_depth; d++) {
-                      f = l->filters[d];
-                      f_sy = f->sy;
-                      f_sx = f->sx;
-
-                      l_biases_wd = l->biases->w[d];
-                      l_out_sx = l->out_sx;
-                      l_out_sy = l->out_sy;
-
-                      y = -2;
-                      for(ay = 0; ay < l_out_sy; y += xy_stride, ay++) {
-                        x = -2;
-                        for(ax=0; ax < l_out_sx; x += xy_stride, ax++) {
-                          a = 0.0;
-                          for(fy = 0; fy < f_sy; fy++) {
-                            oy = y + fy;
-
-                            if(oy >= V_sy){
-                              break;
-                            }
-                            if(oy >= 0){
-
-                              for(fx = 0; fx < f_sx && (fx+x) < V_sx; fx++) {
-                                ox = x + fx;
-
-                                if(ox >=0) {
-
-                    a += f->w[((f_sx * fy)+fx)*3] * V->w[((V_sx * oy)+ox)*V_depth];
-                    a += f->w[((f_sx * fy)+fx)*3+1] * V->w[((V_sx * oy)+ox)*V_depth+1];
-                    a += f->w[((f_sx * fy)+fx)*3+2] * V->w[((V_sx * oy)+ox)*V_depth+2];
-                  }
-                }
-              }
-            }
-
-      a += l_biases_wd;
-      A->w[((A->sx * ay) + ax)*A_depth+d] = a;
-                  }
-                }
-              }
-            }
-
-                  else if(f_depth == 16){
+                  // else if(f_depth == 16){
                     for(d = 0; d < l_out_depth; d++) {
                       f = l->filters[d];
                       f_sy = f->sy;
@@ -330,10 +380,57 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
                   }
                   }
                   }
+                }
+                  uint64_t end1 = timestamp_us();
 
+                  total1 += end1-start1;
 
                   }
-                  else if(f_depth == 20){
+void conv_forward20(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) {
+    uint64_t start1 = timestamp_us();
+
+    int xy_stride;
+    int x;
+    int y;
+    int oy, ox;
+    int l_out_sx;
+    int l_out_sy;
+    int f_sy, f_sx;
+    int fx, fy, fd;
+    int ay, ax;
+    int i, d;
+    int f_v, v_v;
+
+    double a;
+    double l_biases_wd;
+
+    vol_t* V;
+    vol_t* A;
+    vol_t* f;
+
+    int V_sx;
+    int V_sy;
+    int f_depth, V_depth, A_depth;
+    int l_out_depth;
+
+    __m256d next_v;
+    __m256d next_f;
+    __m256d result;
+    double part[4];
+
+    for (i = start; i <= end; i++) {
+    V = in[i];
+    A = out[i];
+    V_sx = V->sx;
+    V_sy = V->sy;
+    l_out_depth = l->out_depth;
+    xy_stride = l->stride;
+    V_depth = V->depth;
+    A_depth = A->depth;
+    //f needs a value
+    f = l->filters[0];
+    f_depth = f->depth;
+                //  else if(f_depth == 20){
                     for(d = 0; d < l_out_depth; d++) {
                       f = l->filters[d];
                       f_sy = f->sy;
@@ -414,7 +511,7 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
     total1 += end1-start1;
 
 }
-}
+
 
 
 void conv_load(conv_layer_t* l, const char* fn) {
@@ -860,13 +957,13 @@ void free_batch(batch_t* v, int size) {
  */
 
 void net_forward(network_t* net, batch_t* v, int start, int end) {
-  conv_forward(net->l0, v[0], v[1], start, end);
+  conv_forward3(net->l0, v[0], v[1], start, end);
   relu_forward(net->l1, v[1], v[2], start, end);
   pool_forward(net->l2, v[2], v[3], start, end);
-  conv_forward(net->l3, v[3], v[4], start, end);
+  conv_forward16(net->l3, v[3], v[4], start, end);
   relu_forward(net->l4, v[4], v[5], start, end);
   pool_forward(net->l5, v[5], v[6], start, end);
-  conv_forward(net->l6, v[6], v[7], start, end);
+  conv_forward20(net->l6, v[6], v[7], start, end);
   relu_forward(net->l7, v[7], v[8], start, end);
   pool_forward(net->l8, v[8], v[9], start, end);
   fc_forward(net->l9, v[9], v[10], start, end);
