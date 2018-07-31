@@ -926,6 +926,7 @@ void net_classify_cats(network_t* net, vol_t** input, double* output, int n) {
     output[i] = batch[11][0]->w[CAT_LABEL];
 
   }
+}
   printf("%s", "forward: ");
   printf("%" PRIu64 "\n", total1);
   printf("%s", "relu: ");
@@ -937,7 +938,7 @@ void net_classify_cats(network_t* net, vol_t** input, double* output, int n) {
   printf("%s", "softmax: ");
   printf("%" PRIu64 "\n", total5);
   free_batch(batch, 1);
-}
+
 }
 
 // IGNORE EVERYTHING BELOW THIS POINT -----------------------------------------
