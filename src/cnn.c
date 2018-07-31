@@ -243,15 +243,10 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
                             }
                             if(oy >= 0){
 
-                              for(fx = 0; fx < f_sx; fx++) {
+                              for(fx = 0; fx < f_sx && (fx+x) < V_sx; fx++) {
                                 ox = x + fx;
 
-                                if(ox >= V_sx){
-                                  break;
-                                }
                                 if(ox >=0) {
-
-
 
                     a += f->w[((f_sx * fy)+fx)*3] * V->w[((V_sx * oy)+ox)*V_depth];
                     a += f->w[((f_sx * fy)+fx)*3+1] * V->w[((V_sx * oy)+ox)*V_depth+1];
@@ -919,7 +914,7 @@ void net_classify_cats(network_t* net, vol_t** input, double* output, int n) {
     output[i+6] = image_11[6]->w[CAT_LABEL];
     output[i+7] = image_11[7]->w[CAT_LABEL];
   }
-#pragma omp master
+#pragma omp master //allows only one single thread to execute
 {
   for (int i = n/8 * 8; i < n; i++){
     copy_vol(batch[0][0], input[i]);
