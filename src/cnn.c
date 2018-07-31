@@ -229,9 +229,9 @@ void conv_forward3(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end)
         l_out_sx = l->out_sx;
         l_out_sy = l->out_sy;
 
-        y = -2;
+        y = -l->pad;
         for(ay = 0; ay < l_out_sy; y += xy_stride, ay++) {
-          x = -2;
+          x = -l->pad;
           for(ax=0; ax < l_out_sx; x += xy_stride, ax++) {
             a = 0.0;
             for(fy = 0; fy < f_sy; fy++) {
@@ -242,19 +242,19 @@ void conv_forward3(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end)
               }
               if(oy >= 0){
 
-                for(fx = -x; fx < f_sx; fx++) {
+                for(fx = 2; fx < f_sx; fx++) {
                   ox = x + fx;
 
                   if(ox >= V_sx){
                     break;
                   }
-
+                  //if(ox >=0) {
                     f_v = ((f_sx * fy)+fx)*3;
                     v_v = ((V_sx * oy)+ox)*V_depth;
       a += f->w[f_v] * V->w[v_v];
       a += f->w[f_v+1] * V->w[v_v+1];
       a += f->w[f_v+2] * V->w[v_v+2];
-
+    //}
   }
 }
 }
@@ -337,13 +337,13 @@ void conv_forward16(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
               }
               if(oy >= 0){
 
-                for(fx = -x; fx < f_sx; fx++) {
+                for(fx = 0; fx < f_sx; fx++) {
                   ox = x + fx;
 
                   if(ox >= V_sx){
                     break;
                   }
-
+                  if(ox >=0) {
 
 
 
@@ -371,7 +371,7 @@ void conv_forward16(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
 
       a = a + part[0] + part[1] + part[2] + part[3];
 
-
+      }
       }
       }
       }
@@ -453,13 +453,13 @@ void conv_forward20(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
               }
               if(oy >= 0){
 
-                for(fx = -x; fx < f_sx; fx++) {
+                for(fx = 0; fx < f_sx; fx++) {
                   ox = x + fx;
 
                   if(ox >= V_sx){
                     break;
                   }
-
+                  if(ox >=0) {
 
 
 
@@ -495,7 +495,7 @@ void conv_forward20(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
         }
       }
     }
-
+  }
 
 a += l_biases_wd;
 A->w[((A->sx * ay) + ax)*A_depth+d] = a;
