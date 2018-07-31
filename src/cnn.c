@@ -243,8 +243,10 @@ void conv_forward(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
               for(fx = 0; fx < f_sx; fx++) {
                 ox = x + fx;
 
-
-                if(ox >=0 && ox < V_sx) {
+                if(ox >= V_sx){
+                  break;
+                }
+                if(ox >=0) {
 
 
 
