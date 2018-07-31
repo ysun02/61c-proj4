@@ -889,12 +889,10 @@ void net_forward(network_t* net, batch_t* v, int start, int end) {
 
 #define CAT_LABEL 3
 void net_classify_cats(network_t* net, vol_t** input, double* output, int n) {
+  batch_t* batch = make_batch(net, 8);
   #pragma omp parallel
   {
-  batch_t* batch = make_batch(net, 8);
-
   #pragma omp for
-
   for (int i = 0; i < n/8 * 8; i+=8) {
     batch_t image_0 = batch[0];
 
@@ -920,17 +918,15 @@ void net_classify_cats(network_t* net, vol_t** input, double* output, int n) {
     output[i+6] = image_11[6]->w[CAT_LABEL];
     output[i+7] = image_11[7]->w[CAT_LABEL];
   }
-  #pragma omp master
-  {
+
+
+}
   for (int i = n/8 * 8; i < n; i++){
     copy_vol(batch[0][0], input[i]);
     net_forward(net, batch, 0, 0);
     output[i] = batch[11][0]->w[CAT_LABEL];
-
   }
-}
   free_batch(batch, 8);
-}
   printf("%s", "forward: ");
   printf("%" PRIu64 "\n", total1);
   printf("%s", "relu: ");
