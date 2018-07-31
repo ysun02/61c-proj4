@@ -937,7 +937,7 @@ void net_classify_cats(network_t* net, vol_t** input, double* output, int n) {
   printf("%" PRIu64 "\n", total4);
   printf("%s", "softmax: ");
   printf("%" PRIu64 "\n", total5);
-  free_batch(batch, 1);
+  free_batch(batch, 8);
 
 }
 
