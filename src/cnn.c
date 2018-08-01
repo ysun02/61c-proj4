@@ -187,8 +187,7 @@ void conv_forward3(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end)
     int ay, ax;
     int i, d;
     int f_v, v_v;
-    double f_p = f->w;
-    double v_p = V->w;
+    double f_p, v_p;
 
     double a;
     double l_biases_wd;
@@ -211,6 +210,8 @@ void conv_forward3(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end)
     for (i = start; i <= end; i++) {
     V = in[i];
     A = out[i];
+
+    v_p = V->w;
     V_sx = V->sx;
     V_sy = V->sy;
     l_out_depth = l->out_depth;
@@ -227,6 +228,7 @@ void conv_forward3(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end)
         f_depth = f->depth;
         f_sy = f->sy;
         f_sx = f->sx;
+        f_p = f->w;
 
 
         l_biases_wd = l->biases->w[d];
@@ -289,8 +291,7 @@ void conv_forward16(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
     int ay, ax;
     int i, d;
     int f_v, v_v;
-    double f_p = f->w;
-    double v_p = V->w;
+    double f_p, v_p;
 
     double a;
     double l_biases_wd;
@@ -318,10 +319,13 @@ void conv_forward16(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
     xy_stride = l->stride;
     V_depth = V->depth;
     A_depth = A->depth;
+
+    v_p = V->w;
     //f needs a value
 
       for(d = 0; d < l_out_depth; d++) {
         f = l->filters[d];
+        f_p = f->w;
         f_sy = f->sy;
         f_sx = f->sx;
         f_depth = f->depth;
@@ -406,8 +410,7 @@ void conv_forward20(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
     int ay, ax;
     int i, d;
     int f_v, v_v;
-    double f_p = f->w;
-    double v_p = V->w;
+    double f_p, v_p;
 
     double a;
     double l_biases_wd;
@@ -429,6 +432,7 @@ void conv_forward20(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
     for (i = start; i <= end; i++) {
     V = in[i];
     A = out[i];
+    v_p = V->w;
     V_sx = V->sx;
     V_sy = V->sy;
     l_out_depth = l->out_depth;
@@ -440,6 +444,8 @@ void conv_forward20(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
   //  else if(f_depth == 20){
       for(d = 0; d < l_out_depth; d++) {
         f = l->filters[d];
+        f_p = f->w;
+
         f_sy = f->sy;
         f_sx = f->sx;
         f_depth = f->depth;
