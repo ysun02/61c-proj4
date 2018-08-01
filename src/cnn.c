@@ -187,6 +187,7 @@ void conv_forward3(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end)
     int ay, ax;
     int i, d;
     int f_v, v_v;
+    int l_pad;
 
 
     double a;
@@ -215,6 +216,7 @@ void conv_forward3(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end)
     V_sx = V->sx;
     V_sy = V->sy;
     A_sx = A->sx;
+    l_pad = l->pad;
     double *a_p = A->w;
     l_out_depth = l->out_depth;
     xy_stride = l->stride;
@@ -237,9 +239,9 @@ void conv_forward3(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end)
         l_out_sx = l->out_sx;
         l_out_sy = l->out_sy;
 
-        y = -l->pad;
+        y = -l_pad;
         for(ay = 0; ay < l_out_sy; y += xy_stride, ay++) {
-          x = -l->pad;
+          x = -l_pad;
           for(ax=0; ax < l_out_sx; x += xy_stride, ax++) {
             a = 0.0;
             int val_A = ((A_sx * ay) + ax)*A_depth+d;
@@ -294,6 +296,7 @@ void conv_forward16(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
     int ay, ax;
     int i, d;
     int f_v, v_v;
+    int l_pad;
 
 
     double a;
@@ -320,6 +323,7 @@ void conv_forward16(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
     V_sx = V->sx;
     V_sy = V->sy;
     A_sx = A->sx;
+    l_pad = l->pad;
     l_out_depth = l->out_depth;
     xy_stride = l->stride;
     V_depth = V->depth;
@@ -338,9 +342,9 @@ void conv_forward16(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
         l_out_sx = l->out_sx;
         l_out_sy = l->out_sy;
 
-        y = -l->pad;
+        y = -l_pad;
         for(ay = 0; ay < l_out_sy; y += xy_stride, ay++) {
-          x = -l->pad;
+          x = -l_pad;
           for(ax=0; ax < l_out_sx; x += xy_stride, ax++) {
             a = 0.0;
             int val_A = ((A_sx * ay) + ax)*A_depth+d;
@@ -416,6 +420,7 @@ void conv_forward20(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
     int ay, ax;
     int i, d;
     int f_v, v_v;
+    int l_pad;
 
 
     double a;
@@ -447,6 +452,7 @@ void conv_forward20(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
     xy_stride = l->stride;
     V_depth = V->depth;
     A_depth = A->depth;
+    l_pad = l->pad;
 
     //f needs a value
 
@@ -462,9 +468,9 @@ void conv_forward20(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
         l_out_sx = l->out_sx;
         l_out_sy = l->out_sy;
 
-        y = -l->pad;
+        y = -l_pad;
         for(ay = 0; ay < l_out_sy; y += xy_stride, ay++) {
-          x = -l->pad;
+          x = -l_pad;
           for(ax=0; ax < l_out_sx; x += xy_stride, ax++) {
             a = 0.0;
             int val_A = ((A_sx * ay) + ax)*A_depth+d;
