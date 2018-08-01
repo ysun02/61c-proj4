@@ -187,11 +187,11 @@ void conv_forward3(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end)
     int ay, ax;
     int i, d;
     int f_v, v_v;
-    double f_p, v_p;
+    double* f_p, v_p;
 
     double a;
     double l_biases_wd;
-    double f->w;
+    double* f->w;
 
     vol_t* V;
     vol_t* A;
@@ -291,7 +291,7 @@ void conv_forward16(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
     int ay, ax;
     int i, d;
     int f_v, v_v;
-    double f_p, v_p;
+    double* f_p, v_p;
 
     double a;
     double l_biases_wd;
@@ -410,7 +410,7 @@ void conv_forward20(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
     int ay, ax;
     int i, d;
     int f_v, v_v;
-    double f_p, v_p;
+    double* f_p, v_p;
 
     double a;
     double l_biases_wd;
