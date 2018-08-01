@@ -981,29 +981,29 @@ double conv_l1=0.0, relu_l1 = 0.0, pool_l1 = 0.0, conv_l2 = 0.0, relu_l2 = 0.0,
 pool_l2 = 0.0, conv_l3=0.0, relu_l3 = 0.0, pool_l3 = 0.0, fc = 0.0, softmax = 0.0;
 
 void net_forward(network_t* net, batch_t* v, int start, int end) {
-  int conv_start1 = timestamp_us();
+  uint64_t conv_start1 = timestamp_us();
   conv_forward3(net->l0, v[0], v[1], start, end);
-  int relu_start1 = timestamp_us();
+  uint64_t relu_start1 = timestamp_us();
   relu_forward(net->l1, v[1], v[2], start, end);
-  int pool_start1 = timestamp_us();
+  uint64_t pool_start1 = timestamp_us();
   pool_forward(net->l2, v[2], v[3], start, end);
-  int conv_start2 = timestamp_us();
+  uint64_t conv_start2 = timestamp_us();
   conv_forward16(net->l3, v[3], v[4], start, end);
-  int relu_start2 = timestamp_us();
+  uint64_t relu_start2 = timestamp_us();
   relu_forward(net->l4, v[4], v[5], start, end);
-  int pool_start2 = timestamp_us();
+  uint64_t pool_start2 = timestamp_us();
   pool_forward(net->l5, v[5], v[6], start, end);
-  int conv_start3 = timestamp_us();
+  uint64_t conv_start3 = timestamp_us();
   conv_forward20(net->l6, v[6], v[7], start, end);
-  int relu_start3 = timestamp_us();
+  uint64_t relu_start3 = timestamp_us();
   relu_forward(net->l7, v[7], v[8], start, end);
-  int pool_start3 = timestamp_us();
+  uint64_t pool_start3 = timestamp_us();
   pool_forward(net->l8, v[8], v[9], start, end);
-  int fc_start = timestamp_us();
+  uint64_t fc_start = timestamp_us();
   fc_forward(net->l9, v[9], v[10], start, end);
-  int softmax_start = timestamp_us();
+  uint64_t softmax_start = timestamp_us();
   softmax_forward(net->l10, v[10], v[11], start, end);
-  int end = timestamp_us();
+  uint64_t ends = timestamp_us();
 
   conv_l1 += relu_start1 - conv_start1;
   relu_l1 += pool_start1 - relu_start1;
@@ -1018,7 +1018,7 @@ void net_forward(network_t* net, batch_t* v, int start, int end) {
   pool_l3 += fc_start - pool_start3;
 
   fc += softmax_start - fc_start;
-  softmax += end - softmax_start;
+  softmax += ends - softmax_start;
 
 
 }
@@ -1078,30 +1078,30 @@ void net_classify_cats(network_t* net, vol_t** input, double* output, int n) {
 }
 
   printf("%s", "conv_l1: ");
-  printf("%" PRIu64 "\n", conv_l1);
+  printf("%f\n", conv_l1/1000);
   printf("%s", "relu_l1: ");
-  printf("%" PRIu64 "\n", relu_l1);
+  printf("%f\n", relu_l1/1000);
   printf("%s", "pool_l1: ");
-  printf("%" PRIu64 "\n", pool_l1);
+  printf("%f\n", pool_l1/1000);
 
   printf("%s", "conv_l2: ");
-  printf("%" PRIu64 "\n", conv_l2);
+  printf("%f\n", conv_l2/1000);
   printf("%s", "relu_l2: ");
-  printf("%" PRIu64 "\n", relu_l2);
+  printf("%f\n", relu_l2/1000);
   printf("%s", "pool_l2: ");
-  printf("%" PRIu64 "\n", pool_l2);
+  printf("%f\n", pool_l2/1000);
 
   printf("%s", "conv_l3: ");
-  printf("%" PRIu64 "\n", conv_l3);
+  printf("%f\n", conv_l3/1000);
   printf("%s", "relu_l3: ");
-  printf("%" PRIu64 "\n", relu_l3);
+  printf("%f\n", relu_l3/1000);
   printf("%s", "pool_l3: ");
-  printf("%" PRIu64 "\n", pool_l3);
+  printf("%f\n", pool_l3/1000);
 
   printf("%s", "fc: ");
-  printf("%" PRIu64 "\n", fc);
+  printf("%f\n", fc/1000);
   printf("%s", "softmax: ");
-  printf("%" PRIu64 "\n", softmax);
+  printf("%f\n", softmax/1000);
 
 }
 
