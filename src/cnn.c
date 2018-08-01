@@ -191,7 +191,7 @@ void conv_forward3(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end)
 
     double a;
     double l_biases_wd;
-    double* f->w;
+    
 
     vol_t* V;
     vol_t* A;
