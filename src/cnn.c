@@ -91,9 +91,6 @@ void free_vol(vol_t* v) {
   free(v->w);
   free(v);
 }
-uint64_t total_conv_l1 = 0;
-uint64_t total_conv_l2 = 0;
-uint64_t total_conv_l3 = 0;
 
 
 // A note about layers --------------------------------------------------------
@@ -173,7 +170,7 @@ conv_layer_t* make_conv_layer(int in_sx, int in_sy, int in_depth,
 }
 
 void conv_forward3(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) {
-    uint64_t start_conv_l1 = timestamp_us();
+
 
     int xy_stride;
     int x;
@@ -275,15 +272,13 @@ a_p[val_A] = a;
   }
 }
 }
-uint64_t end_conv_l1 = timestamp_us();
-total_conv_l1 = end_conv_l1 - start_conv_l1;
-printf("%s", "conv l1: ");
-printf("%" PRIu64 "\n", total_conv_l1);
+
+
 
 }
 
 void conv_forward16(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) {
-    uint64_t start_conv_l2 = timestamp_us();
+
 
     int xy_stride;
     int x;
@@ -399,14 +394,13 @@ void conv_forward16(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
     }
     }
   }
-    uint64_t end_conv_l2 = timestamp_us();
-    total_conv_l2 = end_conv_l2-start_conv_l2;
-    printf("%s", "conv l2: ");
-    printf("%" PRIu64 "\n", total_conv_l2);
+
+
+
 
     }
 void conv_forward20(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end) {
-    uint64_t start_conv_l3 = timestamp_us();
+
 
     int xy_stride;
     int x;
@@ -532,10 +526,9 @@ a_p[val_A] = a;
 }
 }
 }
-uint64_t end_conv_l3 = timestamp_us();
-total_conv_l3 = end_conv_l3-start_conv_l3;
-printf("%s", "conv l3: ");
-printf("%" PRIu64 "\n", total_conv_l3);
+
+
+
 
 }
 
@@ -601,16 +594,14 @@ relu_layer_t* make_relu_layer(int in_sx, int in_sy, int in_depth) {
 }
 
 void relu_forward(relu_layer_t* l, vol_t** in, vol_t** out, int start, int end) {
-    uint64_t start_relu_l1 = timestamp_us();
 
   for (int j = start; j <= end; j++) {
     for (int i = 0; i < l->in_sx*l->in_sy*l->in_depth; i++) {
       out[j]->w[i] = (in[j]->w[i] < 0.0) ? 0.0 : in[j]->w[i];
     }
   }
-  uint64_t end_relu_l1 = timestamp_us();
-  printf("%s", "relu: ");
-  printf("%" PRIu64 "\n", end_relu_l1 - start_relu_l1);
+
+
 }
 
 // Pool Layer -----------------------------------------------------------------
@@ -657,7 +648,7 @@ pool_layer_t* make_pool_layer(int in_sx, int in_sy, int in_depth,
 }
 
 void pool_forward(pool_layer_t* l, vol_t** in, vol_t** out, int start, int end) {
-    uint64_t start_pool_l1 = timestamp_us();
+
     int p_l_sx, p_l_sy;
 
   for (int i = start; i <= end; i++) {
@@ -689,9 +680,8 @@ void pool_forward(pool_layer_t* l, vol_t** in, vol_t** out, int start, int end) 
       }
     }
   }
-  uint64_t end_pool_l1 = timestamp_us();
-  printf("%s", "relu: ");
-  printf("%" PRIu64 "\n", end_pool_l1 - start_pool_l1);
+
+
 }
 
 // FC Layer -------------------------------------------------------------------
@@ -747,7 +737,7 @@ fc_layer_t* make_fc_layer(int in_sx, int in_sy, int in_depth,
 }
 
 void fc_forward(fc_layer_t* l, vol_t** in, vol_t** out, int start, int end) {
-    uint64_t start_fc_l1 = timestamp_us();
+
 
     for (int j = start; j <= end; j++) {
     vol_t* V = in[j];
@@ -762,10 +752,8 @@ void fc_forward(fc_layer_t* l, vol_t** in, vol_t** out, int start, int end) {
       A->w[i] = a;
     }
   }
-    uint64_t end_fc_l1 = timestamp_us();
 
-    printf("%s", "fc: ");
-    printf("%" PRIu64 "\n", end_fc_l1-start_fc_l1);
+
 }
 
 void fc_load(fc_layer_t* l, const char* fn) {
@@ -830,7 +818,7 @@ softmax_layer_t* make_softmax_layer(int in_sx, int in_sy, int in_depth) {
 }
 
 void softmax_forward(softmax_layer_t* l, vol_t** in, vol_t** out, int start, int end) {
-    uint64_t start_softmax_l1 = timestamp_us();
+
 
   double es[MAX_ES];
 
@@ -858,10 +846,8 @@ void softmax_forward(softmax_layer_t* l, vol_t** in, vol_t** out, int start, int
       A->w[i] = es[i];
     }
   }
-  uint64_t end_softmax_l1 = timestamp_us();
 
-  printf("%s", "softmax: ");
-  printf("%" PRIu64 "\n", end_softmax_l1-start_softmax_l1);
+
 }
 
 // Neural Network -------------------------------------------------------------
@@ -991,19 +977,50 @@ void free_batch(batch_t* v, int size) {
  * as input to v and start/end are the first and the last image in that batch
  * to process (start and end are inclusive).
  */
+double conv_l1=0.0, relu_l1 = 0.0, pool_l1 = 0.0, conv_l2 = 0.0, relu_l2 = 0.0,
+pool_l2 = 0.0, conv_l3=0.0, relu_l3 = 0.0, pool_l3 = 0.0, fc = 0.0, softmax = 0.0;
 
 void net_forward(network_t* net, batch_t* v, int start, int end) {
+  int conv_start1 = timestamp_us();
   conv_forward3(net->l0, v[0], v[1], start, end);
+  int relu_start1 = timestamp_us();
   relu_forward(net->l1, v[1], v[2], start, end);
+  int pool_start1 = timestamp_us();
   pool_forward(net->l2, v[2], v[3], start, end);
+  int conv_start2 = timestamp_us();
   conv_forward16(net->l3, v[3], v[4], start, end);
+  int relu_start2 = timestamp_us();
   relu_forward(net->l4, v[4], v[5], start, end);
+  int pool_start2 = timestamp_us();
   pool_forward(net->l5, v[5], v[6], start, end);
+  int conv_start3 = timestamp_us();
   conv_forward20(net->l6, v[6], v[7], start, end);
+  int relu_start3 = timestamp_us();
   relu_forward(net->l7, v[7], v[8], start, end);
+  int pool_start3 = timestamp_us();
   pool_forward(net->l8, v[8], v[9], start, end);
+  int fc_start = timestamp_us();
   fc_forward(net->l9, v[9], v[10], start, end);
+  int softmax_start = timestamp_us();
   softmax_forward(net->l10, v[10], v[11], start, end);
+  int end = timestamp_us();
+
+  conv_l1 += relu_start1 - conv_start1;
+  relu_l1 += pool_start1 - relu_start1;
+  pool_l1 += conv_start2 - pool_start1;
+
+  conv_l2 += relu_start2 - conv_start2;
+  relu_l2 += pool_start2 - relu_start2;
+  pool_l2 += conv_start3 - pool_start2;
+
+  conv_l3 += relu_start3 - conv_start3;
+  relu_l3 += pool_start3 - relu_start3;
+  pool_l3 += fc_start - pool_start3;
+
+  fc += softmax_start - fc_start;
+  softmax += end - softmax_start;
+
+
 }
 
 /*
@@ -1047,6 +1064,7 @@ void net_classify_cats(network_t* net, vol_t** input, double* output, int n) {
     output[i+5] = image_11[5]->w[CAT_LABEL];
     output[i+6] = image_11[6]->w[CAT_LABEL];
     output[i+7] = image_11[7]->w[CAT_LABEL];
+
   }
 #pragma omp master //allows only one single thread to execute
 {
@@ -1058,6 +1076,33 @@ void net_classify_cats(network_t* net, vol_t** input, double* output, int n) {
   free_batch(batch, 8);
 }
 }
+
+  printf("%s", "conv_l1: ");
+  printf("%" PRIu64 "\n", conv_l1);
+  printf("%s", "relu_l1: ");
+  printf("%" PRIu64 "\n", relu_l1);
+  printf("%s", "pool_l1: ");
+  printf("%" PRIu64 "\n", pool_l1);
+
+  printf("%s", "conv_l2: ");
+  printf("%" PRIu64 "\n", conv_l2);
+  printf("%s", "relu_l2: ");
+  printf("%" PRIu64 "\n", relu_l2);
+  printf("%s", "pool_l2: ");
+  printf("%" PRIu64 "\n", pool_l2);
+
+  printf("%s", "conv_l3: ");
+  printf("%" PRIu64 "\n", conv_l3);
+  printf("%s", "relu_l3: ");
+  printf("%" PRIu64 "\n", relu_l3);
+  printf("%s", "pool_l3: ");
+  printf("%" PRIu64 "\n", pool_l3);
+
+  printf("%s", "fc: ");
+  printf("%" PRIu64 "\n", fc);
+  printf("%s", "softmax: ");
+  printf("%" PRIu64 "\n", softmax);
+
 }
 
 // IGNORE EVERYTHING BELOW THIS POINT -----------------------------------------
