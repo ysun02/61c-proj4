@@ -1,31 +1,31 @@
 
 QUESTION 1
 
-CONV_L1        : 3232.582   ms / 51.97%    
-RELU_L1        : 92.953     ms / 1.49%     
-POOL_L1        : 244.835    ms / 3.94%     
-CONV_L2        : 2035.71    ms / 32.73%    
-RELU_L2        : 18.197     ms / 0.29%     
-POOL_L2        : 57.513     ms / 0.92%     
-CONV_L3        : 510.824    ms / 8.21%     
-RELU_L3        : 3.728      ms / 0.06%     
-POOL_L3        : 13.644     ms / 0.22%     
-FC_L1          : 8.925      ms / 0.14%     
-SOFTMAX_L1     : 1.244      ms / 0.02%     
+CONV_L1        : 3415.467   ms / 41.86%
+RELU_L1        : 37.691     ms / 0.46%
+POOL_L1        : 94.373     ms / 1.16%
+CONV_L2        : 3556.831   ms / 43.59%
+RELU_L2        : 27.079     ms / 0.33%
+POOL_L2        : 28.856     ms / 0.35%
+CONV_L3        : 983.69     ms / 12.06%
+RELU_L3        : 0.979      ms / 0.01%
+POOL_L3        : 7.268      ms / 0.09%
+FC_L1          : 6.563      ms / 0.08%
+SOFTMAX_L1     : 0.827      ms / 0.01%
 
 QUESTION 2
 
-CONV           : 92.91%    
-RELU           : 1.85%     
-POOL           : 5.08%     
-FC             : 0.14%     
-SOFTMAX        : 0.02%     
+CONV           : 97.50%
+RELU           : 0.81%
+POOL           : 1.60%
+FC             : 0.08%
+SOFTMAX        : 0.01%
 
 QUESTION 3
 
-CONV           : 3.30x
+CONV           : 40.31x
 RELU           : 1.01x
-POOL           : 1.04x
+POOL           : 1.02x
 FC             : 1.00x
 SOFTMAX        : 1.00x
 
