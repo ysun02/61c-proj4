@@ -187,9 +187,12 @@ void conv_forward3(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end)
     int ay, ax;
     int i, d;
     int f_v, v_v;
+    double f_p = f->w;
+    double v_p = V->w;
 
     double a;
     double l_biases_wd;
+    double f->w;
 
     vol_t* V;
     vol_t* A;
@@ -225,6 +228,7 @@ void conv_forward3(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end)
         f_sy = f->sy;
         f_sx = f->sx;
 
+
         l_biases_wd = l->biases->w[d];
         l_out_sx = l->out_sx;
         l_out_sy = l->out_sy;
@@ -249,11 +253,12 @@ void conv_forward3(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end)
                     break;
                   }
                   if(ox >=0) {
+
                     f_v = ((f_sx * fy)+fx)*3;
                     v_v = ((V_sx * oy)+ox)*V_depth;
-      a += f->w[f_v] * V->w[v_v];
-      a += f->w[f_v+1] * V->w[v_v+1];
-      a += f->w[f_v+2] * V->w[v_v+2];
+      a += f_p[f_v] * v_p[v_v];
+      a += f_p[f_v+1] * v_p[v_v+1];
+      a += f_p[f_v+2] * v_p[v_v+2];
     }
   }
 }
@@ -284,6 +289,8 @@ void conv_forward16(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
     int ay, ax;
     int i, d;
     int f_v, v_v;
+    double f_p = f->w;
+    double v_p = V->w;
 
     double a;
     double l_biases_wd;
@@ -313,8 +320,6 @@ void conv_forward16(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
     A_depth = A->depth;
     //f needs a value
 
-
-    // else if(f_depth == 16){
       for(d = 0; d < l_out_depth; d++) {
         f = l->filters[d];
         f_sy = f->sy;
@@ -351,12 +356,12 @@ void conv_forward16(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
       v_v = ((V_sx * oy)+ox)*V_depth;
       result = _mm256_setzero_pd();
 
-      next_f = _mm256_loadu_pd((double const*) &f->w[f_v]);
-      next_v = _mm256_loadu_pd((double const*) &V->w[v_v]);
+      next_f = _mm256_loadu_pd((double const*) &f_p[f_v]);
+      next_v = _mm256_loadu_pd((double const*) &v_p[v_v]);
       result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
 
-      next_f = _mm256_loadu_pd((double const*) &f->w[f_v+4]);
-      next_v = _mm256_loadu_pd((double const*) &V->w[v_v+4]);
+      next_f = _mm256_loadu_pd((double const*) &f_p[f_v+4]);
+      next_v = _mm256_loadu_pd((double const*) &v_p[v_v+4]);
       result = _mm256_add_pd(result, _mm256_mul_pd(next_f, next_v));
 
       next_f = _mm256_loadu_pd((double const*) &f->w[f_v+8]);
@@ -401,6 +406,8 @@ void conv_forward20(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
     int ay, ax;
     int i, d;
     int f_v, v_v;
+    double f_p = f->w;
+    double v_p = V->w;
 
     double a;
     double l_biases_wd;
