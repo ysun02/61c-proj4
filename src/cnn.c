@@ -215,7 +215,7 @@ void conv_forward3(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end)
     V_sx = V->sx;
     V_sy = V->sy;
     A_sx = A->sx;
-
+    double *a_p = A->w;
     l_out_depth = l->out_depth;
     xy_stride = l->stride;
     V_depth = V->depth;
@@ -316,6 +316,7 @@ void conv_forward16(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
     for (i = start; i <= end; i++) {
     V = in[i];
     A = out[i];
+    double *a_p = A->w;
     V_sx = V->sx;
     V_sy = V->sy;
     A_sx = A->sx;
