@@ -203,7 +203,8 @@ void conv_forward3(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end)
     __m256d next_f;
     __m256d result;
     double part[4];
-
+    printf("start:%d\n", start);
+    printf("end:%d\n", end);
     for (i = start; i <= end; i++) {
     V = in[i];
     A = out[i];
