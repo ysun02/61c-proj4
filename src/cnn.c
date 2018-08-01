@@ -198,7 +198,7 @@ void conv_forward3(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end)
     vol_t* f;
 
     int V_sx;
-    int V_sy;
+    int V_sy, A_sx;
     int f_depth, V_depth, A_depth;
     int l_out_depth;
 
@@ -214,6 +214,8 @@ void conv_forward3(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end)
     double *v_p = V->w;
     V_sx = V->sx;
     V_sy = V->sy;
+    A_sx = A->sx;
+
     l_out_depth = l->out_depth;
     xy_stride = l->stride;
     V_depth = V->depth;
@@ -240,6 +242,7 @@ void conv_forward3(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end)
           x = -l->pad;
           for(ax=0; ax < l_out_sx; x += xy_stride, ax++) {
             a = 0.0;
+            int val_A = ((A_sx * ay) + ax)*A_depth+d;
             for(fy = 0; fy < f_sy; fy++) {
               oy = y + fy;
 
@@ -267,7 +270,7 @@ void conv_forward3(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end)
 }
 
 a += l_biases_wd;
-A->w[((A->sx * ay) + ax)*A_depth+d] = a;
+a_p[val_A] = a;
     }
   }
 }
@@ -301,7 +304,7 @@ void conv_forward16(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
     vol_t* f;
 
     int V_sx;
-    int V_sy;
+    int V_sy, A_sx;
     int f_depth, V_depth, A_depth;
     int l_out_depth;
 
@@ -315,6 +318,7 @@ void conv_forward16(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
     A = out[i];
     V_sx = V->sx;
     V_sy = V->sy;
+    A_sx = A->sx;
     l_out_depth = l->out_depth;
     xy_stride = l->stride;
     V_depth = V->depth;
@@ -338,6 +342,7 @@ void conv_forward16(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
           x = -l->pad;
           for(ax=0; ax < l_out_sx; x += xy_stride, ax++) {
             a = 0.0;
+            int val_A = ((A_sx * ay) + ax)*A_depth+d;
             for(fy = 0; fy < f_sy; fy++) {
               oy = y + fy;
 
@@ -386,7 +391,7 @@ void conv_forward16(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
       }
 
       a += l_biases_wd;
-      A->w[((A->sx * ay) + ax)*A_depth+d] = a;
+      a_p[val_A] = a;
     }
     }
     }
@@ -420,7 +425,7 @@ void conv_forward20(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
     vol_t* f;
 
     int V_sx;
-    int V_sy;
+    int V_sy, A_sx;
     int f_depth, V_depth, A_depth;
     int l_out_depth;
 
@@ -433,12 +438,15 @@ void conv_forward20(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
     V = in[i];
     A = out[i];
     double *v_p = V->w;
+    double *a_p = A->w;
     V_sx = V->sx;
     V_sy = V->sy;
+    A_sx = A->sx;
     l_out_depth = l->out_depth;
     xy_stride = l->stride;
     V_depth = V->depth;
     A_depth = A->depth;
+
     //f needs a value
 
   //  else if(f_depth == 20){
@@ -453,11 +461,12 @@ void conv_forward20(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
         l_out_sx = l->out_sx;
         l_out_sy = l->out_sy;
 
-        y = -2;
+        y = -l->pad;
         for(ay = 0; ay < l_out_sy; y += xy_stride, ay++) {
-          x = -2;
+          x = -l->pad;
           for(ax=0; ax < l_out_sx; x += xy_stride, ax++) {
             a = 0.0;
+            int val_A = ((A_sx * ay) + ax)*A_depth+d;
             for(fy = 0; fy < f_sy; fy++) {
               oy = y + fy;
 
@@ -511,7 +520,7 @@ void conv_forward20(conv_layer_t* l, vol_t** in, vol_t** out, int start, int end
   }
 
 a += l_biases_wd;
-A->w[((A->sx * ay) + ax)*A_depth+d] = a;
+a_p[val_A] = a;
 
 
 
@@ -642,6 +651,8 @@ pool_layer_t* make_pool_layer(int in_sx, int in_sy, int in_depth,
 
 void pool_forward(pool_layer_t* l, vol_t** in, vol_t** out, int start, int end) {
     uint64_t start3 = timestamp_us();
+    int p_l_sx, p_l_sy;
+
   for (int i = start; i <= end; i++) {
     vol_t* V = in[i];
     vol_t* A = out[i];
